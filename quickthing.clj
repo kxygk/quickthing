@@ -560,6 +560,23 @@
       (Math/abs)
       (Math/round)))) ; get an integer value
 
+(def red-blue-colors
+  (->>
+    "colorcet/CET-D01.csv"
+    io/resource ;; loads from local classpath
+    slurp
+    csv/read-csv
+    (map
+      (fn
+        [color]
+        (map
+          #(Double/parseDouble
+             %)
+          color)))
+    (mapv
+      #(apply
+         col/rgba
+         %))))
 
 
 #_
