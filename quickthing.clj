@@ -1014,6 +1014,6 @@
   (svg/svg
     {:width  1000
      :height 400})
-  svghelpers/serialize-with-line-breaks
+  serialize-with-line-breaks
   (spit
     "out/hist-test.svg"))
