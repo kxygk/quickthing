@@ -410,30 +410,18 @@
                     (map first))
        ys      (->> data
                     (map second))
-       x-min   (let [min (apply min
-                                xs)]
-                 (if (pos? min)
-                   0.0
-                   min))
-       x-max   (let [max (apply max
-                                xs)]
-                 (if (neg? max)
-                   0.0
-                   max))
-       y-min   (let [min (apply min
-                                ys)]
-                 (if (pos? min)
-                   0.0
-                   min))
-       y-max   (let [max (apply max
-                                ys)]
-                 (if (neg? max)
-                   0.0
-                   max))
-       x-range (max (Math/abs x-max)
-                    (Math/abs x-min))
-       y-range (max (Math/abs y-max)
-                    (Math/abs y-min))]
+       x-min   (apply min
+                      xs)
+       x-max   (apply max
+                      xs)
+       y-min   (apply min
+                      ys)
+       y-max   (apply max
+                      ys)
+       x-range (- x-max
+                  x-min)
+       y-range (- y-max
+                  y-min)]
     {:x-axis (viz/linear-axis {:domain      [x-min
                                              x-max]
                                :range       [(* margin-frac
