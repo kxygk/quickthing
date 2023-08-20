@@ -206,276 +206,181 @@
               y-name
               color
               title]
-       :or   {width 1000
-              height 600
+       :or   {width       1000
+              height      600
               margin-frac 0.15
               scale       36
-              color "#0008"}}]]
-  (let[#_#_
-       tick-size (/
-                   (max
-                     width
-                     height)
-                   scale-factor)
-       xs        (->>
-                   data
-                   (map
-                     first))
-       ys        (->>
-                   data
-                   (map
-                     second))
-       x-min     (let [min (apply
-                             min
-                             xs)]
-                   (if (pos?
-                         min)
-                     0.0
-                     min))
-       x-max     (let [max (apply
-                             max
-                             xs)]
-                   (if (neg?
-                         max)
-                     0.0
-                     max))
-       y-min     (let [min (apply
-                             min
-                             ys)]
-                   (if (pos?
-                         min)
-                     0.0
-                     min))
-       y-max     (let [max (apply
-                             max
-                             ys)]
-                   (if (neg?
-                         max)
-                     0.0
-                     max))
-       x-range   (max
-                   (Math/abs
-                     x-max)
-                   (Math/abs
-                     x-min))
-       y-range   (max
-                   (Math/abs
-                     y-max)
-                   (Math/abs
-                     y-min))]
-     {:x-axis (viz/linear-axis
-                {:domain      [(-
-                                 (if (zero?
-                                       x-min)
+              color       "#0008"}}]]
+  (let[xs      (->> data
+                    (map first))
+       ys      (->> data
+                    (map second))
+       x-min   (let [min (apply min
+                                xs)]
+                 (if (pos? min)
+                   0.0
+                   min))
+       x-max   (let [max (apply max
+                                xs)]
+                 (if (neg? max)
+                   0.0
+                   max))
+       y-min   (let [min (apply min
+                                ys)]
+                 (if (pos? min)
+                   0.0
+                   min))
+       y-max   (let [max (apply  max
+                                 ys)]
+                 (if (neg? max)
+                   0.0
+                   max))
+       x-range (max (Math/abs x-max)
+                    (Math/abs x-min))
+       y-range (max (Math/abs y-max)
+                    (Math/abs y-min))]
+    {:x-axis (viz/linear-axis
+               {:domain      [(- (if (zero? x-min)
                                    0.0
-                                   (-
-                                     x-range))
-                                 (*
-                                   x-range
-                                   margin-frac))
-                               (+
-                                 (if (zero?
-                                       x-max)
+                                   (- x-range))
+                                 (* x-range
+                                    margin-frac))
+                              (+ (if (zero? x-max)
                                    0.0
                                    x-range)
-                                 (*
-                                   x-range
-                                   margin-frac))]
-                 :range       [0
-                               width]
-                 :major       (->>
-                                x-range
-                                Math/log10
-                                long
-                                (Math/pow
-                                  10))
-                 :label       (viz/default-svg-label 
-                                (tick-formatter
-                                  (->>
-                                    x-range
-                                    Math/log10
-                                    long
-                                    (Math/pow
-                                      10))))
-                 :pos         (let [data-height (/
-                                                  height
-                                                  (+
-                                                    1.0
-                                                    (*
-                                                      2.0
-                                                      margin-frac)))
-                                    offset      (*
-                                                  margin-frac
-                                                  data-height)]
-                                (if (zero?
-                                      y-max)
-                                  offset
-                                  (if (zero?
-                                        y-min)
-                                    (-
-                                      height
-                                      offset)
-                                    (/
-                                      height
-                                      2.0))))
-                 :label-dist  (/
-                                scale
-                                1.75)
-                 :label-style {:fill        "black"
-                               :stroke      "none"
-                               :font-family "Arial, sans-serif"
-                               :font-size   (/
-                                              scale
-                                              2.0)
-                               :text-anchor "start"
-                               :transform   (str
-                                              "translate("
-                                              (/
-                                                scale
-                                                4.0)
-                                              " "
-                                              0.0
-                                              ")")}})
-      :y-axis (viz/linear-axis
-                {:domain      [(-
-                                  (if (zero?
-                                        y-min)
-                                    0.0
-                                    (-
-                                      y-range))
-                                  (*
-                                    y-range
-                                    margin-frac))
-                                (+
-                                  (if (zero?
-                                        y-max)
-                                    0.0
-                                    y-range)
-                                  (*
-                                    y-range
+                                 (* x-range
                                     margin-frac))]
-                 :range       [height
-                                0]
-                 :major       (->>
-                                 y-range
-                                 Math/log10
-                                 long
-                                 (Math/pow
-                                   10))
-                 :label       (viz/default-svg-label
-                                 (tick-formatter
-                                   (->>
-                                     y-range
-                                     Math/log10
-                                     long
-                                     (Math/pow
-                                       10))))
-                 :pos         (let [data-width (/
-                                                 width
-                                                 (+
-                                                   1.0
-                                                   (*
-                                                     2.0
-                                                     margin-frac)))
-                                    offset     (*
-                                                 margin-frac
-                                                 data-width)]
-                                 (if (zero?
-                                       x-max)
-                                   (-
-                                     width
-                                     offset)
-                                   (if (zero?
-                                         x-min)
-                                     offset
-                                     (/
-                                       width
-                                       2.0))))
-                 :label-dist  (/
-                                 scale
-                                 4.0)
-                 :label-y     (/
-                                 scale
-                                 -4.0)
-                 :label-style {:fill        "black"
-                               :stroke      "none"
-                               :font-family "Arial, sans-serif"
-                               :font-size   (/
-                                              scale
+                :range       [0
+                              width]
+                :major       (->> x-range
+                                  Math/log10
+                                  long
+                                  (Math/pow 10))
+                :label       (viz/default-svg-label (->> x-range
+                                                         Math/log10
+                                                         long
+                                                         (Math/pow 10)
+                                                         tick-formatter))
+                :pos         (let [data-height (/ height
+                                                  (+ 1.0
+                                                     (* 2.0
+                                                        margin-frac)))
+                                   offset      (* margin-frac
+                                                  data-height)]
+                               (if (zero? y-max)
+                                 offset
+                                 (if (zero? y-min)
+                                   (- height
+                                      offset)
+                                   (/ height
+                                      2.0))))
+                :label-dist  (/ scale
+                                1.75)
+                :label-style {:fill        "black"
+                              :stroke      "none"
+                              :font-family "Arial, sans-serif"
+                              :font-size   (/ scale
                                               2.0)
-                               :text-anchor "end"}})
-      :grid   {:attribs {:stroke
-                         "#caa"
-                         :stroke-dasharray (str
-                                             (/
-                                               scale
-                                               10.0)
-                                             " "
-                                             (/
-                                               scale
-                                               5.0))
-                         :stroke-width     (/
-                                             scale
+                              :text-anchor "start"
+                              :transform   (str "translate("
+                                                (/ scale
+                                                   4.0)
+                                                " "
+                                                0.0
+                                                ")")}})
+     :y-axis (viz/linear-axis
+               {:domain      [(- (if (zero? y-min)
+                                   0.0
+                                   (- y-range))
+                                 (* y-range
+                                    margin-frac))
+                              (+ (if (zero? y-max)
+                                   0.0
+                                   y-range)
+                                 (* y-range
+                                    margin-frac))]
+                :range       [height
+                              0]
+                :major       (->> y-range
+                                  Math/log10
+                                  long
+                                  (Math/pow 10))
+                :label       (viz/default-svg-label (->> y-range
+                                                         Math/log10
+                                                         long
+                                                         (Math/pow 10)
+                                                         tick-formatter))
+               :pos         (let [data-width (/ width
+                                                (+ 1.0
+                                                    (* 2.0
+                                                       margin-frac)))
+                                   offset     (* margin-frac
+                                                 data-width)]
+                               (if (zero? x-max)
+                                 (- width
+                                    offset)
+                                 (if (zero? x-min)
+                                   offset
+                                   (/ width
+                                      2.0))))
+                :label-dist  (/ scale
+                                4.0)
+                :label-y     (/ scale
+                                -4.0)
+                :label-style {:fill        "black"
+                              :stroke      "none"
+                              :font-family "Arial, sans-serif"
+                              :font-size   (/ scale
+                                              2.0)
+                              :text-anchor "end"}})
+     :grid   {:attribs {:stroke
+                        "#caa"
+                        :stroke-dasharray (str (/ scale
+                                                  10.0)
+                                               " "
+                                               (/ scale
+                                                  5.0))
+                        :stroke-width     (/ scale
                                              50.0)}
-               :minor-x true
-               :minor-y true}
-      :data   (cond->
-                  []
-                (some?
-                  title) (conj
-                            (quickthing/adjustable-text
-                              [[x-max
-                                y-max
-                                title
-                                {:dx                (-
-                                                      (/
-                                                        scale
-                                                        2.0))
-                                 :dy                (/
-                                                      scale
-                                                      2.0)
-                                 :font-size         scale
-                                 :font-family       "Arial, sans-serif"
-                                 :fill        "#0004"
-                                 :text-anchor       "end"
-                                 :dominant-baseline "hanging"}]]))
-               (some?
-                 x-name) (conj
-                            (quickthing/adjustable-text
-                              [[(/
-                                  x-max
-                                  2.0)
-                                0
-                                x-name
-                                {:dy                (/
-                                                      scale
-                                                      1.5)
-                                 :font-size         (/
-                                                      scale
-                                                      2.75)
-                                 :font-family "Arial, sans-serif"
-                                 :text-anchor       "middle"
-                                 :dominant-baseline "hanging"}]]))
-               (some?
-                 y-name) (conj
-                            (quickthing/adjustable-text
-                              [[0
-                                (/
-                                  y-max
-                                  2.0)
-                                y-name
-                                {:dx                (/
-                                                      scale
-                                                      -1.0)
-                                 :writing-mode "vertical-lr"
-                                 :text-orientation "sideways"
-                                 :font-size         (/
-                                                      scale
-                                                      2.75)
-                                 :font-family "Arial, sans-serif"
-                                 :text-anchor       "middle"
-                                 :dominant-baseline "bottom"}]])))}))
-
+              :minor-x true
+              :minor-y true}
+     :data   (cond-> []
+               (some? title)  (conj (quickthing/adjustable-text[[x-max
+                                                                 y-max
+                                                                 title
+                                                                 {:dx                (- (/ scale
+                                                                                           2.0))
+                                                                  :dy                (/ scale
+                                                                                        2.0)
+                                                                  :font-size         scale
+                                                                  :font-family       "Arial, sans-serif"
+                                                                  :fill              "#0004"
+                                                                  :text-anchor       "end"
+                                                                  :dominant-baseline "hanging"}]]))
+               (some? x-name) (conj (quickthing/adjustable-text [[(/ x-max
+                                                                     2.0)
+                                                                  0
+                                                                  x-name
+                                                                  {:dy                (/ scale
+                                                                                         1.5)
+                                                                   :font-size         (/ scale
+                                                                                         2.75)
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :text-anchor       "middle"
+                                                                   :dominant-baseline "hanging"}]]))
+               (some? y-name) (conj (quickthing/adjustable-text [[0
+                                                                  (/ y-max
+                                                                     2.0)
+                                                                  y-name
+                                                                  {:dx                (/ scale
+                                                                                         -1.0)
+                                                                   :writing-mode      "vertical-lr"
+                                                                   :text-orientation  "sideways"
+                                                                   :font-size         (/ scale
+                                                                                         2.75)
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :text-anchor       "middle"
+                                                                   :dominant-baseline "bottom"}]])))}))
 
 (defn
   new-axis
@@ -493,280 +398,158 @@
               main-color
               color
               title]
-       :or   {width 1000
-              height 600
-              margin-frac 0.15
+       :or   {width            1000
+              height           600
+              margin-frac      0.15
               y-breathing-room 1.1
-              scale       36
-              main-color "black"
-              color "black"}}]]
-  (let[#_#_
-       tick-size (/
-                   (max
-                     width
-                     height)
-                   scale-factor)
-       xs        (->>
-                   data
-                   (map
-                     first))
-       ys        (->>
-                   data
-                   (map
-                     second))
-       x-min     (let [min (apply
-                             min
-                             xs)]
-                   (if (pos?
-                         min)
-                     0.0
-                     min))
-       x-max     (let [max (apply
-                             max
-                             xs)]
-                   (if (neg?
-                         max)
-                     0.0
-                     max))
-       y-min     (let [min (apply
-                             min
-                             ys)]
-                   (if (pos?
-                         min)
-                     0.0
-                     min))
-       y-max     (let [max (apply
-                             max
-                             ys)]
-                   (if (neg?
-                         max)
-                     0.0
-                     max))
-       x-range   (max
-                   (Math/abs
-                     x-max)
-                   (Math/abs
-                     x-min))
-       y-range   (max
-                   (Math/abs
-                     y-max)
-                   (Math/abs
-                     y-min))]
-     {:x-axis (viz/linear-axis
-                {:domain      [x-min
-                               x-max]
-                 :range       [(*
-                                 margin-frac
-                                 width)
-                               (-
-                                 width
-                                 (*
-                                   margin-frac
-                                   width))]
-                 :major       (->>
-                                x-range
-                                Math/log10
-                                long
-                                (Math/pow
-                                  10))
-                 :label       (viz/default-svg-label
-                                (tick-formatter
-                                  (->>
-                                    x-range
-                                    Math/log10
-                                    long
-                                    (Math/pow
-                                      10))))
-                 :pos         (-
-                                 height
-                                 (*
-                                   margin-frac
-                                   height))
-                 #_0.0
-                 #_(let [data-height (/
-                                                  height
-                                                  (+
-                                                    1.0
-                                                    (*
-                                                      2.0
-                                                      margin-frac)))
-                                    offset      (*
-                                                  margin-frac
-                                                  data-height)]
-                                (if (zero?
-                                      y-max)
-                                  offset
-                                  (if (zero?
-                                        y-min)
-                                    (-
-                                      height
-                                      offset)
-                                    (/
-                                      height
-                                      2.0))))
-                 :label-dist  (/
-                                scale
-                                1.75)
-                 :attribs     {:stroke main-color}
-                 :label-style {:fill        main-color
-                               :stroke      "none"
-                               :font-family "Arial, sans-serif"
-                               :font-size   (/
-                                              scale
-                                              2.0)
-                               :text-anchor "start"
-                               :transform   (str
-                                              "translate("
-                                              (/
-                                                scale
-                                                4.0)
-                                              " "
-                                              0.0
-                                              ")")}})
-      :y-axis (viz/linear-axis
-                {:domain      [(*
-                                 y-min
-                                  y-breathing-room)
-                               (*
-                                 y-max
-                                 y-breathing-room)]
-                 :range       [
-                               (-
-                                 height
-                                 (*
-                                   margin-frac
-                                   height))
-                               (*
-                                 margin-frac
-                                 height)]
-                 :major       (->>
-                                 y-range
-                                 Math/log10
-                                 long
-                                 (Math/pow
-                                   10))
-                 :label       (viz/default-svg-label
-                                 (tick-formatter
-                                   (->>
-                                     y-range
-                                     Math/log10
-                                     long
-                                     (Math/pow
-                                       10))))
-                 :pos         (*
-                                 margin-frac
-                                 width)
-                 #_(let [data-width (/
-                                                 width
-                                                 (+
-                                                   1.0
-                                                   (*
-                                                     2.0
-                                                     margin-frac)))
-                                    offset     (*
-                                                 margin-frac
-                                                 data-width)]
-                                 (if (zero?
-                                       x-max)
-                                   (-
-                                     width
-                                     offset)
-                                   (if (zero?
-                                         x-min)
-                                     offset
-                                     (/
-                                       width
-                                       2.0))))
-                 :label-dist  (/
-                                 scale
-                                 4.0)
-                 :label-y     (/
-                                 scale
-                                 -4.0)
-                 :attribs     {:stroke color}
-                 :label-style {:fill        main-color
-                               :stroke      "none"
-                               :font-family "Arial, sans-serif"
-                               :font-size   (/
-                                              scale
-                                              2.0)
-                               :text-anchor "end"}})
-      :grid   {:attribs {:stroke
-                         "#caa"
-                         :stroke-dasharray (str
-                                             (/
-                                               scale
-                                               10.0)
-                                             " "
-                                             (/
-                                               scale
-                                               5.0))
-                         :stroke-width     (/
-                                             scale
+              scale            36
+              main-color       "black"
+              color            "black"}}]]
+  (let[xs      (->> data
+                    (map first))
+       ys      (->> data
+                    (map second))
+       x-min   (let [min (apply min
+                                xs)]
+                 (if (pos? min)
+                   0.0
+                   min))
+       x-max   (let [max (apply max
+                                xs)]
+                 (if (neg? max)
+                   0.0
+                   max))
+       y-min   (let [min (apply min
+                                ys)]
+                 (if (pos? min)
+                   0.0
+                   min))
+       y-max   (let [max (apply max
+                                ys)]
+                 (if (neg? max)
+                   0.0
+                   max))
+       x-range (max (Math/abs x-max)
+                    (Math/abs x-min))
+       y-range (max (Math/abs y-max)
+                    (Math/abs y-min))]
+    {:x-axis (viz/linear-axis {:domain      [x-min
+                                             x-max]
+                               :range       [(* margin-frac
+                                                width)
+                                             (- width
+                                                (* margin-frac
+                                                   width))]
+                               :major       (->> x-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10))
+                               :label       (->> x-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10)
+                                                 tick-formatter
+                                                 viz/default-svg-label)
+                               :pos         (- height
+                                               (* margin-frac
+                                                  height))
+                               :label-dist  (/ scale
+                                               1.75)
+                               :attribs     {:stroke main-color}
+                               :label-style {:fill        main-color
+                                             :stroke      "none"
+                                             :font-family "Arial, sans-serif"
+                                             :font-size   (/ scale
+                                                             2.0)
+                                             :text-anchor "start"
+                                             :transform   (str "translate("
+                                                               (/ scale
+                                                                  4.0)
+                                                               " "
+                                                               0.0
+                                                               ")")}})
+     :y-axis (viz/linear-axis {:domain      [(* y-min
+                                                y-breathing-room)
+                                             (* y-max
+                                                y-breathing-room)]
+                               :range       [(- height
+                                                (* margin-frac
+                                                   height))
+                                             (* margin-frac
+                                                height)]
+                               :major       (->> y-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10))
+                               :label       (->>
+                                              y-range
+                                              Math/log10
+                                              long
+                                              (Math/pow 10)
+                                              tick-formatter
+                                              viz/default-svg-label)
+                               :pos         (* margin-frac
+                                               width)
+                               :label-dist  (/ scale
+                                               4.0)
+                               :label-y     (/ scale
+                                               -4.0)
+                               :attribs     {:stroke color}
+                               :label-style {:fill        main-color
+                                             :stroke      "none"
+                                             :font-family "Arial, sans-serif"
+                                             :font-size   (/ scale
+                                                             2.0)
+                                             :text-anchor "end"}})
+     :grid   {:attribs {:stroke           "#caa"
+                        :stroke-dasharray (str (/ scale
+                                                  10.0)
+                                               " "
+                                               (/ scale
+                                                  5.0))
+                        :stroke-width     (/ scale
                                              50.0)}
-               :minor-x true
-               :minor-y true}
-      :data   (cond->
-                  []
-                (some?
-                  title) (conj
-                            (quickthing/adjustable-text
-                              [[x-max
-                                y-max
-                                title
-                                {:dx                (-
-                                                      (/
-                                                        scale
-                                                        2.0))
-                                 :dy                (/
-                                                      scale
-                                                      2.0)
-                                 :font-size         scale
-                                 :font-family       "Arial, sans-serif"
-                                 :fill        "#0004"
-                                 :text-anchor       "end"
-                                 :dominant-baseline "hanging"}]]))
-               (some?
-                 x-name) (conj
-                            (quickthing/adjustable-text
-                              [[(/
-                                  x-max
-                                  2.0)
-                                0
-                                x-name
-                                {:dy                (/
-                                                      scale
-                                                      1.5)
-                                 :font-size         (/
-                                                      scale
-                                                      2.75)
-                                 :fill        main-color
-                                 :font-family "Arial, sans-serif"
-                                 :text-anchor       "middle"
-                                 :dominant-baseline "hanging"}]]))
-               (some?
-                 y-name) (conj
-                            (quickthing/adjustable-text
-                              [[0
-                                (/
-                                  y-max
-                                  2.0)
-                                y-name
-                                {:dx                (/
-                                                      scale
-                                                      -1.0)
-                                 :writing-mode "vertical-lr"
-                                 :text-orientation "sideways"
-                                 :font-size         (/
-                                                      scale
-                                                      2.75)
-                                 :fill        color
-                                 :font-family "Arial, sans-serif"
-                                 :text-anchor       "middle"
-                                 :dominant-baseline "bottom"}]])))}))
-
-
-
+              :minor-x true
+              :minor-y true}
+     :data   (cond-> []
+               (some? title)  (conj (quickthing/adjustable-text [[x-max
+                                                                  y-max
+                                                                  title
+                                                                  {:dx                (- (/ scale
+                                                                                            2.0))
+                                                                   :dy                (/ scale
+                                                                                         2.0)
+                                                                   :font-size         scale
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :fill              "#0004"
+                                                                   :text-anchor       "end"
+                                                                   :dominant-baseline "hanging"}]]))
+               (some? x-name) (conj (quickthing/adjustable-text [[(/ x-max
+                                                                     2.0)
+                                                                  0
+                                                                  x-name
+                                                                  {:dy                (/ scale
+                                                                                         1.5)
+                                                                   :font-size         (/ scale
+                                                                                         2.75)
+                                                                   :fill              main-color
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :text-anchor       "middle"
+                                                                   :dominant-baseline "hanging"}]]))
+               (some? y-name) (conj (quickthing/adjustable-text [[0
+                                                                  (/ y-max
+                                                                     2.0)
+                                                                  y-name
+                                                                  {:dx                (/ scale
+                                                                                         -1.0)
+                                                                   :writing-mode      "vertical-lr"
+                                                                   :text-orientation  "sideways"
+                                                                   :font-size         (/ scale
+                                                                                         2.75)
+                                                                   :fill              color
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :text-anchor       "middle"
+                                                                   :dominant-baseline "bottom"}]])))}))
 
 (defn
   secondary-axis
