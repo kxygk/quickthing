@@ -193,8 +193,8 @@
          tick-value)))))
 
 (defn
-  standard-axis
-  "A ~standard~ axis. In the way we expect.
+  zero-axis
+  "A ~standard~ axis. With the zero point int he plot
   Will adjust to data .. ex: if x/y data is positive..
   then the intersection point will be at the bottom left"
   [data
@@ -383,8 +383,9 @@
                                                                    :dominant-baseline "bottom"}]])))}))
 
 (defn
-  new-axis
-  "A ~standard~ axis. In the way we expect.
+  primary-axis
+  "A primary axis in the bottom left
+  Zero point might be out of bounds
   Will adjust to data .. ex: if x/y data is positive..
   then the intersection point will be at the bottom left"
   [data
@@ -1332,12 +1333,15 @@
                           (rand 100)])
                        (range 2000
                               2016))
-        axis (quickthing/standard-axis fake-data
-                                  {:x-name "YEAR"
-                                   :y-name "RAND"
-                                   :title  "TEST-PLOT"
-                                   :color  "#0008"})]
-  (println fake-data)
+      axis (-> fake-data
+               (quickthing/primary-axis {:x-name "YEAR"
+                                         :y-name "RAND"
+                                         :title  "TEST-PLOT"
+                                         :color  "#0008"})
+               (assoc-in [:x-axis
+                          :major]
+                          (range 2000
+                                 2016)))]
   (spit "out/test-hist.svg"
         (-> axis
             (assoc :data
