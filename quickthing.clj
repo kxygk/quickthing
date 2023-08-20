@@ -1529,8 +1529,45 @@
                     total-height)}))))
 
 (defn
+  hist
+  [data]
+  [{:values  data
+    :attribs {:fill         "none"
+              :stroke-width 10 #_(* 0.75
+                               (/
+                                 (-
+                                   width
+                                   left-margin)
+                                 max-x))
+              :stroke       "#ffb2b0"}
+    :layout  viz/svg-bar-plot}])
+#_
+(let [width 1000
+      height 500
+      fake-data (map (fn [i]
+                         [i
+                          (rand 100)])
+                       (range 2000
+                              2016))
+        axis (quickthing/standard-axis fake-data
+                                  {:x-name "YEAR"
+                                   :y-name "RAND"
+                                   :title  "TEST-PLOT"
+                                   :color  "#0008"})]
+  (println fake-data)
+  (spit "out/test-hist.svg"
+        (-> axis
+            (assoc :data
+                   (quickthing/hist fake-data))
+            viz/svg-plot2d-cartesian
+            (quickthing/svg-wrap [width
+                                  height])
+            quickthing/svg2xml)))
+
+(defn
   histogram
-  "`geom-viz` bar graphs assume only positive values
+  "DEPRECATED
+  `geom-viz` bar graphs assume only positive values
   To plot negative values you need to generate two bar graphs
   And then have them glued together"
   ([data
