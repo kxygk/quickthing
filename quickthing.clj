@@ -1302,16 +1302,18 @@
 
 (defn
   hist
-  [data]
+  [data
+   & [{:keys [attribs]}]]
   [{:values  data
-    :attribs {:fill         "none"
-              :stroke-width 10 #_(* 0.75
-                               (/
-                                 (-
-                                   width
-                                   left-margin)
-                                 max-x))
-              :stroke       "#ffb2b0"}
+    :attribs (merge {:fill         "none"
+                     :stroke-width 10 #_ (* 0.75
+                                            (/
+                                              (-
+                                                width
+                                                left-margin)
+                                              max-x))
+                     :stroke       "#ffb2b0"}
+                    attribs)
     :layout  viz/svg-bar-plot}])
 #_
 (let [width 1000
