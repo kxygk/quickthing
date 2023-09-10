@@ -11,6 +11,12 @@
             [thi.ng.ndarray.core  :as ndarray]
             [thi.ng.color.core    :as col]))
 
+(def
+  default-width 1000)
+
+(def
+  default-height 600)
+
 (defn
   svg2xml
   "This takes the SVG hiccup,
@@ -93,6 +99,9 @@
   The height will be adjusted to preserve the aspect ratio.
   `coord-width` and `coord-height` specify the viewport coordinate ranges.
   ie. the local coordinates where the element is located"
+   ([svg-element]
+    (svg-wrap [default-width
+               default-height]))
   ([svg-element
    [coord-width
     coord-height]]
@@ -206,8 +215,8 @@
               y-name
               color
               title]
-       :or   {width       1000
-              height      600
+       :or   {width       default-width
+              height      default-height
               margin-frac 0.15
               scale       36
               color       "#0008"}}]]
@@ -558,8 +567,8 @@
               y-name
               color
               main-color]
-       :or   {width 1000
-              height 600
+       :or   {width default-width
+              height default-height
               margin-frac 0.15
               y-breathing-room 1.1
               scale       36
@@ -1148,8 +1157,8 @@
                           [-0.14690961790698875 -0.06429230926537097]
                           [-0.10099303440764114 0.12223651116682559]
                           [-0.09737276162805063 0.1688277553150298]]]
-  (let [width  1000
-        height 1000
+  (let [width  default-width
+        height default-height
         data   sample-projections]
     (->>
       (->
