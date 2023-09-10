@@ -955,6 +955,35 @@
   [1 2 4 5 6])
 
 (defn
+  vector2d
+  "Draw a vector"
+  [[x
+    y]
+   & [{:keys [attribs
+              scale]
+       :or {attribs nil
+            scale 36}}]]
+  [{:values  [[0.0, 0.0]
+              [x, y]]
+    :attribs (merge {:stroke-width     (/ scale
+                                          10.0)
+                     :stroke           "#aaa"}
+                    attribs)
+    :layout  svg-trueline-plot}])
+#_
+(vector2d [1.0
+           1.0])
+#_
+(->> (-> (quickthing/zero-axis [[ 2.0,  2.0]
+                                [-2.0, -2.0]])
+       (assoc :data
+              (vector2d [1.0, 1.0]))
+       (viz/svg-plot2d-cartesian)
+       svg-wrap)
+     svg2xml
+     (spit "./out/test-vector.svg"))
+
+(defn
   index-text
   "Calls `adjustable-text` but inserts the index automatically"
   ([data]
