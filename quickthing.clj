@@ -24,12 +24,10 @@
   - inserts new line characters
   If the SVG is output as one one long line.. most editors are unhappy"
   [svg]
-  (->
-    svg
-    svg/serialize
-    (clojure.string/replace
-      #"><"
-      ">\n<")))
+  (-> svg
+      svg/serialize
+      (clojure.string/replace #"><"
+                              ">\n<")))
 
 #_(defn
     set-coords
@@ -41,15 +39,12 @@
     [svg-element
      [coord-width
       coord-height]]
-    (->>
-      svg-element
-      (svg/svg
-        {:viewBox
-         (str
-           "0 0 "
-           coord-width
-           " "
-           coord-height)})))
+    (->> svg-element
+         (svg/svg {:viewBox
+                   (str "0 0 "
+                        coord-width
+                        " "
+                        coord-height)})))
 
 #_
 (defn
@@ -64,33 +59,29 @@
      coord-height]
     display-width]
    (->> svg-element
-        (svg/svg
-          {:width
-           display-width
-           :viewBox
-           (str
-             "0 0 "
-             coord-width
-             " "
-             coord-height)})))
+        (svg/svg {:width
+                  display-width
+                  :viewBox
+                  (str "0 0 "
+                       coord-width
+                       " "
+                       coord-height)})))
   ([svg-element
     [coord-width
      coord-height]
     display-width
     display-height]
    (->> svg-element
-        (svg/svg
-          {:width
-           display-width
-           ;;
-           :height
-           display-height
-           :viewBox
-           (str
-             "0 0 "
-             coord-width
-             " "
-             coord-height)}))))
+        (svg/svg {:width
+                  display-width
+                  ;;
+                  :height
+                  display-height
+                  :viewBox
+                  (str "0 0 "
+                       coord-width
+                       " "
+                       coord-height)}))))
 
 (defn
   svg-wrap
@@ -99,39 +90,29 @@
   The height will be adjusted to preserve the aspect ratio.
   `coord-width` and `coord-height` specify the viewport coordinate ranges.
   ie. the local coordinates where the element is located"
-   ([svg-element]
-    (svg-wrap [default-width
-               default-height]))
+  ([svg-element]
+   (svg-wrap [default-width, default-height]))
   ([svg-element
-   [coord-width
-    coord-height]]
-   (->>
-      svg-element
-      (svg/svg
-        {:viewBox (str
-                    "0 0 "
-                    coord-width
-                    " "
-                    coord-height)})))
+    [coord-width, coord-height]]
+   (->> svg-element
+        (svg/svg {:viewBox (str "0 0 "
+                                coord-width
+                                " "
+                                coord-height)})))
   ([svg-element
-   [coord-width
-    coord-height]
-   display-width]
-  (let [aspect-ratio (/
-                       coord-width
-                       coord-height)]
-    (->>
-      svg-element
-      (svg/svg
-        {:width   display-width
-         :height  (/
-                    display-width
-                    aspect-ratio)
-         :viewBox (str
-                    "0 0 "
-                    coord-width
-                    " "
-                    coord-height)})))))
+    [coord-width
+     coord-height]
+    display-width]
+   (let [aspect-ratio (/ coord-width
+                         coord-height)]
+     (->> svg-element
+          (svg/svg {:width   display-width
+                    :height  (/ display-width
+                                aspect-ratio)
+                    :viewBox (str "0 0 "
+                                  coord-width
+                                  " "
+                                  coord-height)})))))
 
 (defn
   serialize
@@ -140,43 +121,35 @@
   [svg-xml-str]
   (-> svg-xml-str
       svg/serialize
-      (#(clojure.string/replace
-          %
-          #"><"
-          ">\n<"))))
+      (#(clojure.string/replace %
+                                #"><"
+                                ">\n<"))))
 
 (defn
   adjustable-text
   "add a customizable text display
   `data` is a vector of [x,y,text,attribs]"
   ([data]
-   (adjustable-text
-     data
-     36))
+   (adjustable-text data
+                    36))
   ([data
     scale]
    {:values data             ;; each data point as an [a b text attrib]]
-    :shape  (fn              ;; the `fn` takes [[x y] [a b text attrib]]
-              [[[plot-x      ;; [x y] are the drawing coords on the plot
-                 plot-y]
-                [_ ;; data-x ;; [a b] are the original data point values
-                 _ ;; data-y
-                 text        ;; "extra" provided data
-                 attribs]]]
-              (svg/text
-                [plot-x
-                 plot-y]
-                (str
-                  text)
-                (merge
-                  {:fill              "#444"
-                   :stroke            "none"
-                   :text-anchor       "middle"
-                   :dominant-baseline "central"
-                   :font-size         (/
-                                        scale
-                                        3.0)}
-                  attribs)))
+    :shape  (fn [[[plot-x            ;; the `fn` takes [[x y] [a b text attrib]]
+                   plot-y]  ;; [x y] are the drawing coords on the plot
+                  [_ ;; data-x ;; [a b] are the original data point values
+                   _ ;; data-y
+                   text        ;; "extra" provided data
+                   attribs]]]
+              (svg/text [plot-x, plot-y]
+                        (str text)
+                        (merge {:fill              "#444"
+                                :stroke            "none"
+                                :text-anchor       "middle"
+                                :dominant-baseline "central"
+                                :font-size         (/ scale
+                                                      3.0)}
+                               attribs)))
     :layout viz/svg-scatter-plot}))
 
 (defn
@@ -188,18 +161,13 @@
   [tick-spacing]
   (let [power (Math/log10
                 tick-spacing)]
-    (fn
-      [tick-value]
-      (str
-        ((viz/value-formatter
-           (if (neg?
-                 power)
-             (->
-               power
-               Math/abs
-               long)
-             0))
-         tick-value)))))
+    (fn [tick-value]
+      (str ((viz/value-formatter (if (neg? power)
+                                   (-> power
+                                       Math/abs
+                                       long)
+                                   0))
+            tick-value)))))
 
 (defn
   zero-axis
@@ -220,34 +188,34 @@
               margin-frac 0.15
               scale       36
               color       "#0008"}}]]
-  (let[xs      (->> data
-                    (map first))
-       ys      (->> data
-                    (map second))
-       x-min   (let [min (apply min
-                                xs)]
-                 (if (pos? min)
-                   0.0
-                   min))
-       x-max   (let [max (apply max
-                                xs)]
-                 (if (neg? max)
-                   0.0
-                   max))
-       y-min   (let [min (apply min
-                                ys)]
-                 (if (pos? min)
-                   0.0
-                   min))
-       y-max   (let [max (apply  max
+  (let [xs      (->> data
+                     (map first))
+        ys      (->> data
+                     (map second))
+        x-min   (let [min (apply min
+                                 xs)]
+                  (if (pos? min)
+                    0.0
+                    min))
+        x-max   (let [max (apply max
+                                 xs)]
+                  (if (neg? max)
+                    0.0
+                    max))
+        y-min   (let [min (apply min
                                  ys)]
-                 (if (neg? max)
-                   0.0
-                   max))
-       x-range (max (Math/abs x-max)
-                    (Math/abs x-min))
-       y-range (max (Math/abs y-max)
-                    (Math/abs y-min))]
+                  (if (pos? min)
+                    0.0
+                    min))
+        y-max   (let [max (apply  max
+                                  ys)]
+                  (if (neg? max)
+                    0.0
+                    max))
+        x-range (max (Math/abs x-max)
+                     (Math/abs x-min))
+        y-range (max (Math/abs y-max)
+                     (Math/abs y-min))]
     {:x-axis (viz/linear-axis
                {:domain      [(- (if (zero? x-min)
                                    0.0
@@ -259,8 +227,7 @@
                                    x-range)
                                  (* x-range
                                     margin-frac))]
-                :range       [0
-                              width]
+                :range       [0, width]
                 :major       (->> x-range
                                   Math/log10
                                   long
@@ -319,8 +286,8 @@
                                                          long
                                                          (Math/pow 10)
                                                          tick-formatter))
-               :pos         (let [data-width (/ width
-                                                (+ 1.0
+                :pos         (let [data-width (/ width
+                                                 (+ 1.0
                                                     (* 2.0
                                                        margin-frac)))
                                    offset     (* margin-frac
@@ -415,24 +382,23 @@
               scale            36
               main-color       "black"
               color            "black"}}]]
-  (let[xs      (->> data
-                    (map first))
-       ys      (->> data
-                    (map second))
-       x-min   (apply min
-                      xs)
-       x-max   (apply max
-                      xs)
-       y-min   (apply min
-                      ys)
-       y-max   (apply max
-                      ys)
-       x-range (- x-max
-                  x-min)
-       y-range (- y-max
-                  y-min)]
-    {:x-axis (viz/linear-axis {:domain      [x-min
-                                             x-max]
+  (let [xs      (->> data
+                     (map first))
+        ys      (->> data
+                     (map second))
+        x-min   (apply min
+                       xs)
+        x-max   (apply max
+                       xs)
+        y-min   (apply min
+                       ys)
+        y-max   (apply max
+                       ys)
+        x-range (- x-max
+                   x-min)
+        y-range (- y-max
+                   y-min)]
+    {:x-axis (viz/linear-axis {:domain      [x-min, x-max]
                                :range       [(* margin-frac
                                                 width)
                                              (- width
@@ -479,13 +445,12 @@
                                                  Math/log10
                                                  long
                                                  (Math/pow 10))
-                               :label       (->>
-                                              y-range
-                                              Math/log10
-                                              long
-                                              (Math/pow 10)
-                                              tick-formatter
-                                              viz/default-svg-label)
+                               :label       (->> y-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10)
+                                                 tick-formatter
+                                                 viz/default-svg-label)
                                :pos         (* margin-frac
                                                width)
                                :label-dist  (/ scale
@@ -567,392 +532,236 @@
               y-name
               color
               main-color]
-       :or   {width default-width
-              height default-height
-              margin-frac 0.15
+       :or   {width            default-width
+              height           default-height
+              margin-frac      0.15
               y-breathing-room 1.1
-              scale       36
-              color "#0008"
-              main-color "#0008"}}]]
-  (let[#_#_
-       tick-size (/
-                   (max
-                     width
-                     height)
-                   scale-factor)
-       xs        (->>
-                   data
-                   (map
-                     first))
-       ys        (->>
-                   data
-                   (map
-                     second))
-       x-min     (let [min (apply
-                             min
-                             xs)]
-                   (if (pos?
-                         min)
-                     0.0
-                     min))
-       x-max     (let [max (apply
-                             max
-                             xs)]
-                   (if (neg?
-                         max)
-                     0.0
-                     max))
-       y-min     (let [min (apply
-                             min
-                             ys)]
-                   (if (pos?
-                         min)
-                     0.0
-                     min))
-       y-max     (let [max (apply
-                             max
-                             ys)]
-                   (if (neg?
-                         max)
-                     0.0
-                     max))
-       x-range   (max
-                   (Math/abs
-                     x-max)
-                   (Math/abs
-                     x-min))
-       y-range   (max
-                   (Math/abs
-                     y-max)
-                   (Math/abs
-                     y-min))]
-    {:x-axis (viz/linear-axis
-               {:domain      [x-min
-                              x-max]
-                :range       [(*
-                                margin-frac
-                                width)
-                              (-
-                                width
-                                (*
-                                  margin-frac
-                                  width))]
-                :major       (->>
-                               x-range
-                               Math/log10
-                               long
-                               (Math/pow
-                                 10))
-                :major-size  (- 10) ;; 10 is default from `geom/viz`
-                :label       (viz/default-svg-label
-                               (tick-formatter
-                                 (->>
-                                   x-range
-                                   Math/log10
-                                   long
-                                   (Math/pow
-                                     10))))
-                :pos         (*
-                                 margin-frac
-                                 height)
-                #_(let [data-height (/
-                                                 height
-                                                 (+
-                                                   1.0
-                                                   (*
-                                                     2.0
-                                                     margin-frac)))
-                                   offset      (*
-                                                 margin-frac
-                                                 data-height)]
-                               (if (zero?
-                                     y-max)
-                                 offset
-                                 (if (zero?
-                                       y-min)
-                                   offset
-                                   (/
-                                     height
-                                     2.0))))
-                :attribs     {:stroke main-color}
-                :label-dist  (/
-                               scale
-                               -5.75)
-                :label-style {:fill        main-color
-                              :stroke      "none"
-                              :font-family "Arial, sans-serif"
-                              :font-size   (/
-                                             scale
-                                             2.0)
-                              :text-anchor "start"
-                              :transform   (str
-                                             "translate("
-                                             (/
-                                               scale
-                                               4.0)
-                                             " "
-                                             0.0
-                                             ")")}})
-     :y-axis (viz/linear-axis
-               {:domain      [(*
-                                 y-min
-                                  y-breathing-room)
-                               (*
-                                 y-max
-                                 y-breathing-room)]
-                 :range       [(-
-                                 height
-                                 (*
-                                   margin-frac
-                                   height))
-                               (*
-                                 margin-frac
-                                 height)]
-                :major       (->>
-                               y-range
-                               Math/log10
-                               long
-                               (Math/pow
-                                 10))
-                :major-size  (- 10)
-                :label       (viz/default-svg-label
-                               (tick-formatter
-                                 (->>
-                                   y-range
-                                   Math/log10
-                                   long
-                                   (Math/pow
-                                     10))))
-                :pos        (-
-                              width
-                              (*
-                                margin-frac
-                                width)) #_(let [data-width (/
-                                                width
-                                                (+
-                                                  1.0
-                                                  (*
-                                                    2.0
-                                                    margin-frac)))
-                                   offset     (*
-                                                margin-frac
-                                                data-width)]
-                               (if (not
-                                     (zero?
-                                       x-max))
-                                 (-
-                                   width
-                                   offset)
-                                 (if (not
-                                       (zero?
-                                         x-min))
-                                   (-
-                                     width
-                                     offset)
-                                   (/
-                                     width
-                                     2.0))))
-                :attribs     {:stroke color}
-                :label-dist  (/
-                               scale
-                               -2.0)
-                :label-y     (/
-                               scale
-                               -4.0)
-                :label-style {:fill        main-color
-                              :stroke      "none"
-                              :font-family "Arial, sans-serif"
-                              :font-size   (/
-                                             scale
-                                             2.0)
-                              :text-anchor "end"}})
-     #_#_
-     :grid   {:attribs {:stroke
-                        "#caa"}
-              :minor-x true
-              :minor-y true}
-     :data   (cond->
-                  []
+              scale            36
+              color            "#0008"
+              main-color       "#0008"}}]]
+  (let [xs      (->> data
+                     (map first))
+        ys      (->> data
+                     (map second))
+        x-min   (let [min (apply min
+                                 xs)]
+                  (if (pos? min)
+                    0.0
+                    min))
+        x-max   (let [max (apply max
+                                 xs)]
+                  (if (neg? max)
+                    0.0
+                    max))
+        y-min   (let [min (apply min
+                                 ys)]
+                  (if (pos? min)
+                    0.0
+                    min))
+        y-max   (let [max (apply max
+                                 ys)]
+                  (if (neg? max)
+                    0.0
+                    max))
+        x-range (max (Math/abs x-max)
+                     (Math/abs x-min))
+        y-range (max (Math/abs y-max)
+                     (Math/abs y-min))]
+    {:x-axis (viz/linear-axis {:domain      [x-min, x-max]
+                               :range       [(* margin-frac
+                                                width)
+                                             (- width
+                                                (* margin-frac
+                                                   width))]
+                               :major       (->> x-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10))
+                               :major-size  (- 10) ;; 10 is default from `geom/viz`
+                               :label       (viz/default-svg-label (tick-formatter
+                                                                     (->> x-range
+                                                                          Math/log10
+                                                                          long
+                                                                          (Math/pow 10))))
+                               :pos         (* margin-frac
+                                               height)
+                               :attribs     {:stroke main-color}
+                               :label-dist  (/ scale
+                                               -5.75)
+                               :label-style {:fill        main-color
+                                             :stroke      "none"
+                                             :font-family "Arial, sans-serif"
+                                             :font-size   (/ scale
+                                                             2.0)
+                                             :text-anchor "start"
+                                             :transform   (str "translate("
+                                                               (/ scale
+                                                                  4.0)
+                                                               " "
+                                                               0.0
+                                                               ")")}})
+     :y-axis (viz/linear-axis {:domain      [(* y-min
+                                                y-breathing-room)
+                                             (* y-max
+                                                y-breathing-room)]
+                               :range       [(- height
+                                                (* margin-frac
+                                                   height))
+                                             (* margin-frac
+                                                height)]
+                               :major       (->> y-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10))
+                               :major-size  (- 10)
+                               :label       (viz/default-svg-label (tick-formatter (->> y-range
+                                                                                        Math/log10
+                                                                                        long
+                                                                                        (Math/pow 10))))
+                               :pos         (- width
+                                               (* margin-frac
+                                                  width))
+                               :attribs     {:stroke color}
+                               :label-dist  (/ scale
+                                               -2.0)
+                               :label-y     (/ scale
+                                               -4.0)
+                               :label-style {:fill        main-color
+                                             :stroke      "none"
+                                             :font-family "Arial, sans-serif"
+                                             :font-size   (/ scale
+                                                             2.0)
+                                             :text-anchor "end"}})
+     :data   (cond-> []
                ;; no title on secondary axis
-               (some?
-                 y-name) (conj
-                            (quickthing/adjustable-text
-                              [[x-max
-                                (+
-                                  y-min
-                                  (/
-                                    y-range
-                                    2.0))
-                                y-name
-                                {:dx                (/
-                                                      scale
-                                                      1.0)
-                                 :font-size         (/
-                                                      scale
-                                                      2.75)
-                                 :writing-mode "vertical-rl"
-                                 :fill        color
-                                 :stroke      "none"
-                                 :font-family "Arial, sans-serif"
-                                 :text-anchor       "middle"
-                                 :dominant-baseline "bottom"}]]))
-               (some?
-                 x-name) (conj
-                            (quickthing/adjustable-text
-                              [[(/
-                                  x-range
-                                  2.0)
-                                y-max
-                                x-name
-                                {:dy                (/
-                                                      scale
-                                                      -1.5)
-                                 :font-size         (/
-                                                      scale
-                                                      2.75)
-                                 :fill        main-color
-                                 :stroke      "none"
-                                 :font-family "Arial, sans-serif"
-                                 :text-anchor       "middle"
-                                 :dominant-baseline "bottom"}]])))}))
+               (some? y-name) (conj (quickthing/adjustable-text [[x-max
+                                                                  (+ y-min
+                                                                     (/ y-range
+                                                                        2.0))
+                                                                  y-name
+                                                                  {:dx                (/ scale
+                                                                                         1.0)
+                                                                   :font-size         (/ scale
+                                                                                         2.75)
+                                                                   :writing-mode      "vertical-rl"
+                                                                   :fill              color
+                                                                   :stroke            "none"
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :text-anchor       "middle"
+                                                                   :dominant-baseline "bottom"}]]))
+               (some? x-name) (conj (quickthing/adjustable-text [[(/ x-range
+                                                                     2.0)
+                                                                  y-max
+                                                                  x-name
+                                                                  {:dy                (/ scale
+                                                                                         -1.5)
+                                                                   :font-size         (/ scale
+                                                                                         2.75)
+                                                                   :fill              main-color
+                                                                   :stroke            "none"
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :text-anchor       "middle"
+                                                                   :dominant-baseline "bottom"}]])))}))
 
 (defn
   adjustable-circles
   ([data]
-   (adjustable-circles
-     data
-     36))
+   (adjustable-circles data
+                       36))
   ([data
     scale]
    {:values data
-    :shape  (fn
-              [[[plot-x
-                 plot-y]
-                [_ ;; data-x
-                 _ ;; data-y
-                 r
-                 attribs]]]
-              (svg/circle
-                [plot-x
-                 plot-y]
-                (if (nil?
-                      r)
-                  (/
-                    scale
-                    3.0)
-                  r)
-                attribs))
+    :shape  (fn [[[plot-x, plot-y]
+                  [_ ;; data-x
+                   _ ;; data-y
+                   r
+                   attribs]]]
+              (svg/circle [plot-x, plot-y]
+                          (if (nil? r)
+                            (/ scale
+                               3.0)
+                            r)
+                          attribs))
     :layout viz/svg-scatter-plot}))
 
-(defn
+(defn-
   process-points-less
   "Based on `process-points` from `geom/viz`
   Just disables the sorting"
   [{:keys [x-axis y-axis project]}
    {:keys [values item-pos shape]}]
   (let [[ry1
-         ry2] (:range
-               y-axis)]
-    (->>
-      values ;;disable sorting
-      #_
-      (if item-pos
-        (sort-by (comp first item-pos) values)
-        (sort-by first values))
-      (sequence
-        (viz/value-transducer
-          {:cull-domain (:domain
-                         x-axis)
-           :cull-range  (if (<
-                              ry1
-                              ry2)
-                          [ry1
-                           ry2]
-                          [ry2
-                           ry1])
-           :item-pos    item-pos
-           :scale-x     (:scale
-                         x-axis)
-           :scale-y     (:scale
-                         y-axis)
-           :project     project
-           :shape       shape})))))
+         ry2] (:range y-axis)]
+    (->> values ;;disable sorting
+         #_
+         (if item-pos
+           (sort-by (comp first item-pos) values)
+           (sort-by first values))
+         (sequence (viz/value-transducer {:cull-domain (:domain x-axis)
+                                          :cull-range  (if (< ry1
+                                                              ry2)
+                                                         [ry1, ry2]
+                                                         [ry2, ry1])
+                                          :item-pos    item-pos
+                                          :scale-x     (:scale x-axis)
+                                          :scale-y     (:scale y-axis)
+                                          :project     project
+                                          :shape       shape})))))
 
 
-(defn
+(defn-
   svg-trueline-plot
   "Based on `svg-line-plot` from `geom/viz`
   Normal `svg-line-plot` seems to sort the [x,y] point by
   their x coord. So it can only plot 1-to-1 y=f(x) functions"
   [v-spec
    d-spec]
-  (svg/line-strip
-    (map
-      first
-      (process-points-less
-        v-spec
-        d-spec))
-    (:attribs
-     d-spec)))
+  (svg/line-strip (map first
+                       (process-points-less v-spec
+                                            d-spec))
+                  (:attribs d-spec)))
 
 (defn
   dashed-line
   ([data]
-   (dashed-line
-     data
-     36))
+   (dashed-line  data
+                 36))
   ([data
     scale]
    {:values  data
-    :attribs {:stroke-dasharray (str
-                                  (/
-                                    scale
-                                    10.0)
-                                  " "
-                                  (/
-                                    scale
-                                    10.0))
-              :stroke-width     (/
-                                  scale
-                                  10.0)
+    :attribs {:stroke-dasharray (str (/ scale
+                                        10.0)
+                                     " "
+                                     (/ scale
+                                        10.0))
+              :stroke-width     (/ scale
+                                   10.0)
               :stroke           "#aaa"}
     :layout  svg-trueline-plot}))
+
 #_
 (defn
   events-2-rates
   [event-size
-    events]
-   (->>
-     events
-     set
-     (into
-       [])
-     sort
-     (partition
-       2
-       1)
-     (mapcat
-       #(let [start (first
-                      %)
-              end   (second
-                      %)]
-          (let[event-time (-
-                            (second
-                              %)
-                            (first
-                              %))
-               rate (/
-                      event-size
-                      event-time)]
-            [[start
-              rate]
-             [end
-              rate]])))
-     (into [])))
+   events]
+  (->> events
+       set
+       (into [])
+       sort
+       (partition 2
+                  1)
+       (mapcat #(let [start (first %)
+                      end   (second %)]
+                  (let [event-time (- (second %)
+                                      (first %))
+                        rate       (/ event-size
+                                      event-time)]
+                    [[start, rate]
+                     [end,   rate]])))
+       (into [])))
 #_
-(events-2-rates
-  100
-  [1 2 4 5 6])
+(events-2-rates 100
+                [1, 2, 4, 5, 6])
 
 (defn
   vector2d
@@ -961,13 +770,13 @@
     y]
    & [{:keys [attribs
               scale]
-       :or {attribs nil
-            scale 36}}]]
+       :or   {attribs nil
+              scale   36}}]]
   [{:values  [[0.0, 0.0]
               [x, y]]
-    :attribs (merge {:stroke-width     (/ scale
-                                          10.0)
-                     :stroke           "#aaa"}
+    :attribs (merge {:stroke-width (/ scale
+                                      10.0)
+                     :stroke       "#aaa"}
                     attribs)
     :layout  svg-trueline-plot}])
 #_
@@ -976,57 +785,45 @@
 #_
 (->> (-> (quickthing/zero-axis [[ 2.0,  2.0]
                                 [-2.0, -2.0]])
-       (assoc :data
-              (vector2d [1.0, 1.0]))
-       (viz/svg-plot2d-cartesian)
-       svg-wrap)
+         (assoc :data
+                (vector2d [1.0, 1.0]))
+         (viz/svg-plot2d-cartesian)
+         svg-wrap)
      svg2xml
      (spit "./out/test-vector.svg"))
+
 
 (defn
   index-text
   "Calls `adjustable-text` but inserts the index automatically"
   ([data]
-   (index-text
-     data
-     36))
+   (index-text data 36))
   ([data
     scale]
-   (adjustable-text
-     (map-indexed
-       #(conj
-          %2
-          %1) 
-       data)
-     scale)))
+   (adjustable-text (map-indexed #(conj %2
+                                        %1) 
+                                 data)
+                    scale)))
 
 ;; see: https://github.com/thi-ng/color/issues/10
-(prefer-method
-  clojure.pprint/simple-dispatch
-  clojure.lang.IPersistentMap
-  clojure.lang.IDeref)
+(prefer-method clojure.pprint/simple-dispatch
+               clojure.lang.IPersistentMap
+               clojure.lang.IDeref)
 
 ;; color maps are from
 ;; https://colorcet.com/download/index.html
 ;; and are under the Creative Commons BY License
 (def
   cyclic-colors
-  (->>
-    "colorcet/CET-C2.csv"
-    io/resource ;; loads from local classpath
-    slurp
-    csv/read-csv
-    (map
-      (fn
-        [color]
-        (map
-          #(Double/parseDouble
-             %)
-          color)))
-    (mapv
-      #(apply
-         col/rgba
-         %))))
+  (->> "colorcet/CET-C2.csv"
+       io/resource ;; loads from local classpath
+       slurp
+       csv/read-csv
+       (map (fn [color]
+              (map #(Double/parseDouble %)
+                   color)))
+       (mapv #(apply col/rgba
+                     %))))
 
 (defn
   color-cycle
@@ -1034,39 +831,30 @@
   For instance 34.56 will get the 0.56th part of the cycle
   (ie. a little past the middle)"
   [value]
-  (get
-    cyclic-colors
-    (->
-      value
-      double
-      (rem       ; get the number past the decimal
-        1)
-      (*         ; get a value on the 0-255 range
-        255)
-      (Math/abs)
-      (Math/round)))) ; get an integer value
+  (get cyclic-colors
+       (-> value
+           double
+           (rem 1)    ; get the number past the decimal
+           (* 255)    ; get a value on the 0-255 range
+           (Math/abs)
+           (Math/round)))) ; get an integer value
 
-(def red-blue-colors
-  (->>
-    "colorcet/CET-D01.csv"
-    io/resource ;; loads from local classpath
-    slurp
-    csv/read-csv
-    (map
-      (fn
-        [color]
-        (map
-          #(Double/parseDouble
-             %)
-          color)))
-    (mapv
-      #(apply
-         col/rgba
-         %))))
-
+(def
+  red-blue-colors
+  (->> "colorcet/CET-D01.csv"
+       io/resource ;; loads from local classpath
+       slurp
+       csv/read-csv
+       (map
+         (fn [color]
+           (map #(Double/parseDouble
+                   %)
+                color)))
+       (mapv #(apply col/rgba
+                     %))))
 
 #_
-(let[ sample-projections [[-0.04614217920447917 0.06826029947827388]
+(let [sample-projections [[-0.04614217920447917 0.06826029947827388]
                           [-0.014056893042169616 0.011246558242909377]
                           [-0.18018705939173477 0.14419877479058196]
                           [-0.034558336531382704 -0.01972281558736888]
@@ -1189,99 +977,66 @@
   (let [width  default-width
         height default-height
         data   sample-projections]
-    (->>
-      (->
-        (quickthing/standard-axis ;; create the axis
-          data
-          1000
-          1000)
-        (assoc                    ;; add data to the plot
-          :data
-          [(dashed-line           ;; dashed line
-             data)
-           (adjustable-circles    ;; circles that change color
-             (map-indexed
-               (fn
-                 [index
-                  data-point]
-                 (conj
-                   data-point
-                   nil ;; default radius
-                   {:fill   (color-cycle
-                              (-
-                                12.0
-                                (/
-                                  (+
-                                    index
-                                    3.0) ;; so it starts in blue
-                                  12.0)))
-                    :stroke "#777"}))
-               data))
-           (index-text            ;; text label
-             data)])
-        (assoc                    ;; turn off grid
-          :grid
-          nil))
-      (viz/svg-plot2d-cartesian)  ;; turns the plot to svg hiccup
-      (svg/svg                    ;; wraps in an `<svg>` element
-        {:width  width
-         :height height})
-      (svg/serialize)             ;; turns it to XML
-      (spit                       ;; writes to file
-        "out/test.svg"))))
+    (->> (-> (quickthing/standard-axis data
+                                       1000
+                                       1000)
+             (assoc :data
+                    [(dashed-line data)
+                     (adjustable-circles (map-indexed (fn [index
+                                                           data-point]
+                                                        (conj data-point
+                                                              nil ;; default radius
+                                                              {:fill   (color-cycle (- 12.0
+                                                                                       (/ (+ index
+                                                                                             3.0) ;; so it starts in blue
+                                                                                          12.0)))
+                                                               :stroke "#777"}))
+                                                      data))
+                     (index-text data)])
+             (assoc :grid
+                    nil))
+         (viz/svg-plot2d-cartesian)  ;; turns the plot to svg hiccup
+         (svg/svg {:width  width
+                   :height height})
+         (svg/serialize)             ;; turns it to XML
+         (spit "out/test.svg"))))
 
-(defn group-plots-row
+(defn
+  group-plots-row
   "Take a vector of plots and groups them into a row.
       For now it must take a `widths` parameter.
       There is no way to determine the width from the svg elements.
       Hence all plots are the same width"
   [row-of-plots]
-  (let [max-height-in-row (->>
-                            row-of-plots
-                            (map
-                              (fn
-                                [plot]
-                                (->
-                                  plot
-                                  (get
-                                    1)
-                                  :height)))
-                            (apply
-                              max))
+  (let [max-height-in-row (->> row-of-plots
+                               (map (fn [plot]
+                                      (-> plot
+                                          (get 1)
+                                          :height)))
+                               (apply max))
         [total-offset
-         adjusted-plots]  (reduce
-                            (fn
-                              [[horizontal-offset
-                                horizontal-plots]
-                               next-plot]
-                              (println
-                                horizontal-offset)
-                              (let [next-plot-width (->
-                                                      next-plot
-                                                      (get
-                                                        1)
-                                                      :width)
-                                    next-offset     (+
-                                                      horizontal-offset
-                                                      next-plot-width)]
-                                [next-offset
-                                 (conj
-                                   horizontal-plots 
-                                   (svg/group
-                                     {:transform (geom/translate
-                                                   matrix/M32
-                                                   [horizontal-offset
-                                                    0])}
-                                     next-plot))]))
-                            [0
-                             []]
-                            row-of-plots)]
+         adjusted-plots]  (reduce (fn [[horizontal-offset
+                                        horizontal-plots]
+                                       next-plot]
+                                    (println horizontal-offset)
+                                    (let [next-plot-width (-> next-plot
+                                                              (get 1)
+                                                              :width)
+                                          next-offset     (+ horizontal-offset
+                                                             next-plot-width)]
+                                      [next-offset
+                                       (conj horizontal-plots 
+                                             (svg/group {:transform (geom/translate matrix/M32
+                                                                                    [horizontal-offset, 0])}
+                                                        next-plot))]))
+                                  [0
+                                   []]
+                                  row-of-plots)]
     [total-offset
      max-height-in-row
-     (apply
-       svg/group
-       {}
-       adjusted-plots)]))
+     (apply svg/group
+            {}
+            adjusted-plots)]))
 
 (defn
   group-plots-grid
@@ -1293,50 +1048,36 @@
   [plots]
   (let [[total-height
          final-horizontal-offsets
-         adjusted-row-groups] (reduce
-                                (fn
-                                  [[vertical-offset
-                                    horizontal-offsets
-                                    vertical-plot-rows]
-                                   row-of-plots]
-                                  (let [[horizontal-offset
-                                         max-height-in-row
-                                         concatenated-row] (group-plots-row
-                                                             row-of-plots)]
-                                    [(+
-                                       vertical-offset
-                                       max-height-in-row)
-                                     (conj
-                                       horizontal-offsets
-                                       horizontal-offset)
-                                     (conj
-                                       vertical-plot-rows
-                                       (svg/group
-                                         {:transform (geom/translate
-                                                       matrix/M32
-                                                       [0
-                                                        vertical-offset])}
-                                         concatenated-row))]))
-                                [0 ;; initial for `reduce`
-                                 []
-                                 []]
-                                plots)
-        total-width           (apply
-                                max
-                                final-horizontal-offsets)]
-    (->>
-      (apply
-        svg/group
-        {}
-        adjusted-row-groups)
-      (svg/svg
-        {:width   total-width
-         :height  total-height
-         :viewBox (str
-                    "0 0 "
-                    total-width
-                    " "
-                    total-height)}))))
+         adjusted-row-groups] (reduce (fn [[vertical-offset
+                                            horizontal-offsets
+                                            vertical-plot-rows]
+                                           row-of-plots]
+                                        (let [[horizontal-offset
+                                               max-height-in-row
+                                               concatenated-row] (group-plots-row row-of-plots)]
+                                          [(+ vertical-offset
+                                              max-height-in-row)
+                                           (conj horizontal-offsets
+                                                 horizontal-offset)
+                                           (conj vertical-plot-rows
+                                                 (svg/group {:transform (geom/translate matrix/M32
+                                                                                        [0, vertical-offset])}
+                                                            concatenated-row))]))
+                                      [0 ;; initial for `reduce`
+                                       []
+                                       []]
+                                      plots)
+        total-width           (apply max
+                                     final-horizontal-offsets)]
+    (->> (apply svg/group
+                {}
+                adjusted-row-groups)
+         (svg/svg {:width   total-width
+                   :height  total-height
+                   :viewBox (str "0 0 "
+                                 total-width
+                                 " "
+                                 total-height)}))))
 
 (defn
   hist
@@ -1344,32 +1085,27 @@
    & [{:keys [attribs]}]]
   [{:values  data
     :attribs (merge {:fill         "none"
-                     :stroke-width 10 #_ (* 0.75
-                                            (/
-                                              (-
-                                                width
-                                                left-margin)
-                                              max-x))
+                     :stroke-width 10
                      :stroke       "#ffb2b0"}
                     attribs)
     :layout  viz/svg-bar-plot}])
 #_
-(let [width 1000
-      height 500
+(let [width     1000
+      height    500
       fake-data (map (fn [i]
-                         [i
-                          (rand 100)])
-                       (range 2000
-                              2016))
-      axis (-> fake-data
-               (quickthing/primary-axis {:x-name "YEAR"
-                                         :y-name "RAND"
-                                         :title  "TEST-PLOT"
-                                         :color  "#0008"})
-               (assoc-in [:x-axis
-                          :major]
-                          (range 2000
-                                 2016)))]
+                       [i
+                        (rand 100)])
+                     (range 2000
+                            2016))
+      axis      (-> fake-data
+                    (quickthing/primary-axis {:x-name "YEAR"
+                                              :y-name "RAND"
+                                              :title  "TEST-PLOT"
+                                              :color  "#0008"})
+                    (assoc-in [:x-axis
+                               :major]
+                              (range 2000
+                                     2016)))]
   (spit "out/test-hist.svg"
         (-> axis
             (assoc :data
@@ -1389,61 +1125,45 @@
     width
     height
     left-margin]
-   (histogram
-     data
-     width
-     height
-     left-margin
-     false))                 ;; default not inverted
+   (histogram data
+              width
+              height
+              left-margin
+              false))                 ;; default not inverted
   ([data
     width
     height
     left-margin
     inverted?]
-   (let [xs    (->>
-                 data
-                 (map
-                   first))
-         ys    (->>
-                 data
-                 (map
-                   second))
-         min-x (apply
-                 min
-                 xs)
-         max-x (apply
-                 max
-                 xs)
-         min-y (apply
-                 min
-                 ys)
-         max-y (apply
-                 max
-                 ys)]
-     (histogram
-       data
-       width
-       height
-       left-margin
-       inverted?
-       [(-
-          min-x
-          0.5)
-        (+
-          max-x
-          0.5)
-        (if (pos?
-              min-y)
-          -0.5
-          (-
-            min-y
-            0.5))
-        (if (neg?
-              max-y)
-          0.5
-          (+
-            max-y
-            0.5))])))
+   (let [xs    (->> data
+                    (map first))
+         ys    (->> data
+                    (map second))
+         min-x (apply min
+                      xs)
+         max-x (apply max
+                      xs)
+         min-y (apply min
+                      ys)
+         max-y (apply max
+                      ys)]
+     (histogram data
+                width
+                height
+                left-margin
+                inverted?
+                [(- min-x
+                    0.5)
+                 (+ max-x
+                    0.5)
+                 (if (pos? min-y)
+                   -0.5
+                   (- min-y
+                      0.5))
+                 (if (neg? max-y)
+                   0.5
+                   (+ max-y
+                      0.5))])))
   ([data
     width
     height
@@ -1456,111 +1176,75 @@
    ;; There is a small bug in `geom-viz`
    ;; where the axis isn't drawn when it's inverted
    ;; so we draw the axis separately
-   (let[axis (viz/svg-plot2d-cartesian
-               {:x-axis (viz/linear-axis
-                          {:domain      [min-x
-                                         max-x]
-	                   :range       [left-margin
-                                         width]
-	                   :minor       0
-	                   :label-style {:fill "none"}
-	                   :pos         (*
-                                          height
-                                          (/
-                                            (if inverted?
-                                              (Math/abs
-                                                min-y)
-                                              max-y)
-                                            (+
-                                              max-y
-                                              (Math/abs
-                                                min-y))))})
-                :y-axis (viz/linear-axis
-                          {:domain [min-y
-                                    max-y]
-	                   :range  (if inverted?
-                                     [0
-                                      height]
-                                     [height
-                                      0])
-	                   ;; :major  1
-	                   ;; :minor  1
-	                   :pos    left-margin})
-                :grid   {:minor-x true
-                         :minor-y false}
-                :data   []})
-        bars (viz/svg-plot2d-cartesian
-               {:x-axis (viz/linear-axis
-                          {:domain      [min-x
-                                         max-x]
-	                   :range       [left-margin
-                                         width]
-                           :visible true
-	                   :pos         (*
-                                          height
-                                          (/
-                                            (if inverted?
-                                              (Math/abs
-                                                min-y)
-                                              max-y)
-                                            (+
-                                              max-y
-                                              (Math/abs
-                                                min-y))))})
-                :y-axis (viz/linear-axis
-                          {:domain [0
-                                    (if inverted?
-                                      min-y
-                                      max-y)]
-	                   :range  [(*
-                                      height
-                                      (/
-                                        (if inverted?
-                                          (Math/abs
-                                            min-y)
-                                          max-y)
-                                        (+
-                                          max-y
-                                          (Math/abs
-                                            min-y))))
-                                    0]
-                           :visible true
-	                   :pos    left-margin})
-                :grid   {:minor-x false
-                         :minor-y false}
-                :data   [{:values data
-                          :attribs {:fill         "none"
-                                    :stroke-width (* 0.75
-                                                     (/
-                                                       (-
-                                                         width
-                                                         left-margin)
-                                                       max-x))
-                                    :stroke       "#ffb2b0"}
-                          :layout  viz/svg-bar-plot}]})]
-     (svg/group
-       {}
-       axis
-       bars))))
+   (let [axis (viz/svg-plot2d-cartesian {:x-axis (viz/linear-axis {:domain      [min-x, max-x]
+	                                                           :range       [left-margin, width]
+	                                                           :minor       0
+	                                                           :label-style {:fill "none"}
+	                                                           :pos         (* height
+                                                                                   (/ (if inverted?
+                                                                                        (Math/abs min-y)
+                                                                                        max-y)
+                                                                                      (+ max-y
+                                                                                         (Math/abs min-y))))})
+                                         :y-axis (viz/linear-axis {:domain [min-y, max-y]
+	                                                           :range  (if inverted?
+                                                                             [0, height]
+                                                                             [height, 0])
+	                                                           ;; :major  1
+	                                                           ;; :minor  1
+	                                                           :pos    left-margin})
+                                         :grid   {:minor-x true
+                                                  :minor-y false}
+                                         :data   []})
+         bars (viz/svg-plot2d-cartesian {:x-axis (viz/linear-axis {:domain  [min-x, max-x]
+	                                                           :range   [left-margin, width]
+                                                                   :visible true
+	                                                           :pos     (* height
+                                                                               (/ (if inverted?
+                                                                                    (Math/abs min-y)
+                                                                                    max-y)
+                                                                                  (+ max-y
+                                                                                     (Math/abs min-y))))})
+                                         :y-axis (viz/linear-axis
+                                                   {:domain  [0
+                                                              (if inverted?
+                                                                min-y
+                                                                max-y)]
+	                                            :range   [(* height
+                                                                 (/ (if inverted?
+                                                                      (Math/abs min-y)
+                                                                      max-y)
+                                                                    (+ max-y
+                                                                       (Math/abs min-y))))
+                                                              0]
+                                                    :visible true
+	                                            :pos     left-margin})
+                                         :grid   {:minor-x false
+                                                  :minor-y false}
+                                         :data   [{:values  data
+                                                   :attribs {:fill         "none"
+                                                             :stroke-width (* 0.75
+                                                                              (/ (- width
+                                                                                    left-margin)
+                                                                                 max-x))
+                                                             :stroke       "#ffb2b0"}
+                                                   :layout  viz/svg-bar-plot}]})]
+     (svg/group {}
+                axis
+                bars))))
 #_
 (->>
-  (histogram
-    [[0 1]
-     [1 2]
-     [2 3]
-     [3 4]
-     [4 5]]
-    1000
-    400
-    40
-    #_
-    [-0.5
-     4.5
-     0
-     6])
-  (svg/svg
-    {:width  1000
-     :height 400})
+  (histogram [[0, 1]
+              [1, 2]
+              [2, 3]
+              [3, 4]
+              [4, 5]]
+             1000
+             400
+             40
+             #_
+             [-0.5, 4.5, 0, 6])
+  (svg/svg {:width  1000
+            :height 400})
   serialize-with-line-breaks
-  (spit
-    "out/hist-test.svg"))
+  (spit "out/hist-test.svg"))
