@@ -890,16 +890,18 @@
   "Draw a vector/line that goes through the point POINT2D (ie. [VEC-X VEC-Y])
   as well as the origin [0, 0]
   The line is fitted to the span of the data (so should always display)
-  Made out of 2 `vector2d` draws"
+  Made out of 2 `vector2d` draws
+  Optionally pass a `:attribs` to style the line"
   [data
-   point2d]
-  (into (->> point2d
-             (stretch-vector2d-to-data data)
-             quickthing/vector2d)
-        (->> point2d
-             (map -)
-             (stretch-vector2d-to-data data)
-             quickthing/vector2d)))
+   point2d
+   & [{:keys [attribs]}]]
+  (into (quickthing/vector2d (->> point2d
+                                  (stretch-vector2d-to-data data))
+                             {:attribs attribs})
+        (quickthing/vector2d (->> point2d
+                                  (map -)
+                                  (stretch-vector2d-to-data data))
+                             {:attribs attribs})))
 #_
 (let [lil-vec (-> (* clojure.math/PI
                      1.6)             ;; PLAY WITH VALUE TO TURN
@@ -912,7 +914,10 @@
            (assoc :data
                   (into [(quickthing/adjustable-circles data)]
                         (line-through-point data
-                                            lil-vec)))
+                                            lil-vec
+                                            {:attribs {:stroke-dasharray (str 4.0
+                                                                              " "
+                                                                              4.0)}})))
            thi.ng.geom.viz.core/svg-plot2d-cartesian
            quickthing/svg-wrap
            quickthing/serialize)
