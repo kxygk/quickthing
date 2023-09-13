@@ -1,5 +1,6 @@
 (ns quickthing
   "Helpers for plotting with `thing.geom.viz`"
+  (:use [clojure.math])
   (:require [clojure.data.csv     :as csv]
             [clojure.java.io      :as io]
             [thi.ng.geom
@@ -794,6 +795,128 @@
      svg2xml
      (spit "./out/test-vector.svg"))
 
+(defn-
+  stretch-vector2d-to-data
+  "Draw a vector [VEC-X VEC-Y]
+  and stretch it so it's in the span of the 2d data given"
+  [data
+   [vec-x, vec-y]]
+  (let [x-max (->> data
+                   (map first)
+                   (into [0])
+                   (apply max))
+        x-min (->> data
+                   (map first)
+                   (into [0])
+                   (apply min))
+        y-max (->> data
+                   (map second)
+                   (into [0])
+                   (apply max))
+        y-min (->> data
+                   (map second)
+                   (into [0])
+                   (apply min))
+        vec-ratio (/ vec-x
+                     vec-y)
+        data-ratio (/ (if (pos? vec-x)
+                        x-max
+                        x-min)
+                      (if (pos? vec-y)
+                        y-max
+                        y-min))]
+    (if (> (abs vec-ratio)
+           (abs data-ratio)) ;; vector intersects the left/right side
+      (let [x-bound (if (pos? vec-x)
+                      x-max
+                      x-min)]
+        [x-bound
+         (/ x-bound
+            vec-ratio)])
+      (let [y-bound (if (pos? vec-y)
+                      y-max
+                      y-min)]
+        [(* y-bound
+            vec-ratio)
+         y-bound]))))
+#_
+(line-through-point [[2,  1.5]
+                          [1, -2]
+                          [-1, 1]
+                          [-1, -2]]
+                         [0.3 0.2])
+#_
+(defn-
+  angle-to-unitvector
+  "Given an angle in radians
+  Return a 2D vector of length 1"
+  [angle]
+  [(cos angle)
+   (sin angle)])
+#_
+(-> [[1,  1]
+     [1, -2]
+     [-1, 1]
+     [-1, -2]]
+    angle-dichotomies
+    first ;; => 0.9462734405957693
+    angle-to-unitvector) ;; => [0.584710284663765 0.8112421851755608]
+
+#_
+(let [lil-vec (-> (* clojure.math/PI
+                     1.9)             ;; PLAY WITH VALUE TO TURN
+                  angle-to-unitvector)
+      data    [[2,  1.5]
+               [1, -2]
+               [-1.2, 1]
+               [-1, -2]]]
+  (let [fit-vec (->> lil-vec
+                     (fit-vect2d-to-data-span data))]
+    (->> (-> (quickthing/zero-axis data)
+             (assoc :data
+                    (into [(quickthing/adjustable-circles data)]
+                          (quickthing/vector2d fit-vec))))
+         thi.ng.geom.viz.core/svg-plot2d-cartesian
+         quickthing/svg-wrap
+         quickthing/serialize
+         (spit "out/test-dots.svg"))
+    (->> fit-vec ;; sanity check
+         reverse
+         (apply /)
+         atan)))
+
+(defn
+  line-through-point
+  "Draw a vector/line that goes through the point POINT2D (ie. [VEC-X VEC-Y])
+  as well as the origin [0, 0]
+  The line is fitted to the span of the data (so should always display)
+  Made out of 2 `vector2d` draws"
+  [data
+   point2d]
+  (into (->> point2d
+             (stretch-vector2d-to-data data)
+             quickthing/vector2d)
+        (->> point2d
+             (map -)
+             (stretch-vector2d-to-data data)
+             quickthing/vector2d)))
+#_
+(let [lil-vec (-> (* clojure.math/PI
+                     1.6)             ;; PLAY WITH VALUE TO TURN
+                  angle-to-unitvector)
+      data    [[2,  1.5]
+               [1, -2]
+               [-1.2, 1]
+               [-1, -2]]]
+  (->> (-> (quickthing/zero-axis data)
+           (assoc :data
+                  (into [(quickthing/adjustable-circles data)]
+                        (line-through-point data
+                                            lil-vec)))
+           thi.ng.geom.viz.core/svg-plot2d-cartesian
+           quickthing/svg-wrap
+           quickthing/serialize)
+       (spit "out/test-dots.svg")))
 
 (defn
   index-text
