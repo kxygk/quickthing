@@ -91,7 +91,8 @@
   `coord-width` and `coord-height` specify the viewport coordinate ranges.
   ie. the local coordinates where the element is located"
   ([svg-element]
-   (svg-wrap [default-width, default-height]))
+   (svg-wrap svg-element
+             [default-width, default-height]))
   ([svg-element
     [coord-width, coord-height]]
    (->> svg-element
@@ -113,6 +114,7 @@
                                   coord-width
                                   " "
                                   coord-height)})))))
+
 
 (defn
   serialize
