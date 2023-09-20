@@ -802,49 +802,67 @@
   [data
    [vec-x, vec-y]]
   (let [x-max (->> data
-                   (map first)
+                   (mapv first)
                    (into [0])
                    (apply max))
         x-min (->> data
-                   (map first)
+                   (mapv first)
                    (into [0])
                    (apply min))
         y-max (->> data
-                   (map second)
+                   (mapv second)
                    (into [0])
                    (apply max))
         y-min (->> data
-                   (map second)
+                   (mapv second)
                    (into [0])
-                   (apply min))
-        vec-ratio (/ vec-x
-                     vec-y)
-        data-ratio (/ (if (pos? vec-x)
-                        x-max
-                        x-min)
-                      (if (pos? vec-y)
-                        y-max
-                        y-min))]
-    (if (> (abs vec-ratio)
-           (abs data-ratio)) ;; vector intersects the left/right side
-      (let [x-bound (if (pos? vec-x)
-                      x-max
-                      x-min)]
-        [x-bound
-         (/ x-bound
-            vec-ratio)])
-      (let [y-bound (if (pos? vec-y)
-                      y-max
-                      y-min)]
-        [(* y-bound
-            vec-ratio)
-         y-bound]))))
+                   (apply min))]
+    (cond (and (pos? vec-x)
+               (or (neg? x-max)
+                   (zero? x-max))) [0.0, 0.0]
+          (and (pos? vec-y)
+               (or (zero? y-max)
+                   (neg? y-max)))  [0.0, 0.0]
+          (and (neg? vec-x)
+               (or (zero? x-min)
+                   (pos? x-min)))  [0.0, 0.0]
+          (and (neg? vec-y)
+               (or (zero? y-min)
+                   (pos? y-min)))  [0.0, 0.0]
+          :else                    (if (zero? vec-y) ;; degenerate case
+                                     (if (pos? vec-x)
+                                       [x-max
+                                        0]
+                                       [x-min
+                                        0])
+                                     (let[vec-ratio  (/ vec-x
+                                                        vec-y)
+                                          data-ratio (/ (if (pos? vec-x)
+                                                          x-max
+                                                          x-min)
+                                                        (if (pos? vec-y)
+                                                          y-max
+                                                          y-min))]
+                                       (if (> (abs vec-ratio)
+                                              (abs data-ratio)) ;; vector intersects the left/right side
+                                         (let [x-bound (if (pos? vec-x)
+                                                         x-max
+                                                         x-min)]
+                                           [x-bound
+                                            (/ x-bound
+                                               vec-ratio)])
+                                         (let [y-bound (if (pos? vec-y)
+                                                         y-max
+                                                         y-min)]
+                                           [(* y-bound
+                                               vec-ratio)
+                                            y-bound])))))))
 #_
 (line-through-point [[2,  1.5]
-                          [1, -2]
-                          [-1, 1]
-                          [-1, -2]]
-                         [0.3 0.2])
+                     [1, -2]
+                     [-1, 1]
+                     [-1, -2]]
+                    [0.3 0.2])
 #_
 (defn-
   angle-to-unitvector
