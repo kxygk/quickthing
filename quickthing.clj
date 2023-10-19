@@ -132,18 +132,18 @@
   adjustable-text
   "add a customizable text display
   `data` is a vector of [x,y,text,attribs]"
-  ([data]
-   (adjustable-text data
-                    36))
-  ([data
-    scale]
-   {:values data             ;; each data point as an [a b text attrib]]
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}}]]
+  [{:values data             ;; each data point as an [a b text attrib]]
     :shape  (fn [[[plot-x            ;; the `fn` takes [[x y] [a b text attrib]]
                    plot-y]  ;; [x y] are the drawing coords on the plot
                   [_ ;; data-x ;; [a b] are the original data point values
                    _ ;; data-y
                    text        ;; "extra" provided data
-                   attribs]]]
+                   inner-attribs]]]
               (svg/text [plot-x, plot-y]
                         (str text)
                         (merge {:fill              "#444"
@@ -152,8 +152,9 @@
                                 :dominant-baseline "central"
                                 :font-size         (/ scale
                                                       3.0)}
+                               inner-attribs
                                attribs)))
-    :layout viz/svg-scatter-plot}))
+    :layout viz/svg-scatter-plot}])
 
 (defn
   tick-formatter
@@ -668,24 +669,26 @@
 
 (defn
   adjustable-circles
-  ([data]
-   (adjustable-circles data
-                       36))
-  ([data
-    scale]
-   {:values data
-    :shape  (fn [[[plot-x, plot-y]
-                  [_ ;; data-x
-                   _ ;; data-y
-                   r
-                   attribs]]]
-              (svg/circle [plot-x, plot-y]
-                          (if (nil? r)
-                            (/ scale
-                               3.0)
-                            r)
-                          attribs))
-    :layout viz/svg-scatter-plot}))
+  "Draws circles.."
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}}]]
+   [{:values data
+     :shape  (fn [[[plot-x, plot-y]
+                   [_ ;; data-x
+                    _ ;; data-y
+                    r
+                    inner-attribs]]]
+               (svg/circle [plot-x, plot-y]
+                           (if (nil? r)
+                             (/ scale
+                                3.0)
+                             r)
+                           (merge attribs ;; point-specific `:attribs` overwrite
+                                  inner-attribs)))
+     :layout viz/svg-scatter-plot}])
 
 (defn-
   process-points-less
@@ -726,21 +729,22 @@
 
 (defn
   dashed-line
-  ([data]
-   (dashed-line  data
-                 36))
-  ([data
-    scale]
-   {:values  data
-    :attribs {:stroke-dasharray (str (/ scale
-                                        10.0)
-                                     " "
-                                     (/ scale
-                                        10.0))
-              :stroke-width     (/ scale
-                                   10.0)
-              :stroke           "#aaa"}
-    :layout  svg-trueline-plot}))
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}}]]
+  [{:values  data
+    :attribs (merge {:stroke-dasharray (str (/ scale
+                                               10.0)
+                                            " "
+                                            (/ scale
+                                               10.0))
+                     :stroke-width     (/ scale
+                                          10.0)
+                     :stroke           "#aaa"}
+                    attribs)
+    :layout  svg-trueline-plot}])
 
 #_
 (defn
@@ -944,14 +948,16 @@
 (defn
   index-text
   "Calls `adjustable-text` but inserts the index automatically"
-  ([data]
-   (index-text data 36))
-  ([data
-    scale]
-   (adjustable-text (map-indexed #(conj %2
-                                        %1) 
-                                 data)
-                    scale)))
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}}]]
+  (adjustable-text (map-indexed #(conj %2
+                                       %1)
+                                data)
+                   {:attribs attribs
+                    :scale   scale}))
 
 ;; see: https://github.com/thi-ng/color/issues/10
 (prefer-method clojure.pprint/simple-dispatch
