@@ -980,20 +980,25 @@
                    color)))
        (mapv #(apply col/rgba
                      %))))
+#_
+(identity cyclic-colors)
 
 (defn
   color-cycle
   "Colors are selected cyclically. 1.0 is one period
   For instance 34.56 will get the 0.56th part of the cycle
-  (ie. a little past the middle)"
+  (ie. a little past the middle)
+  If `nil` return `black`"
   [value]
-  (get cyclic-colors
-       (-> value
-           double
-           (rem 1)    ; get the number past the decimal
-           (* 255)    ; get a value on the 0-255 range
-           (Math/abs)
-           (Math/round)))) ; get an integer value
+  (if (nil? value)
+    (col/rgba 1 1 1)
+    (get cyclic-colors
+         (-> value
+             double
+             (rem 1)    ; get the number past the decimal
+             (* 255)    ; get a value on the 0-255 range
+             (Math/abs)
+             (Math/round))))) ; get an integer value
 
 (def
   red-blue-colors
