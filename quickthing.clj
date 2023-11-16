@@ -953,7 +953,9 @@
               scale]
        :or   {attribs nil
               scale   36}}]]
-  (adjustable-text (map-indexed #(conj %2
+  (adjustable-text (map-indexed #(conj (into []
+                                             (take 2
+                                                   %2))
                                        %1)
                                 data)
                    {:attribs attribs
