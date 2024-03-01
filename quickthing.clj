@@ -401,7 +401,13 @@
         x-range (- x-max
                    x-min)
         y-range (- y-max
-                   y-min)]
+                   y-min)
+        y-full-max (+ y-max
+                      (* y-range
+                         y-breathing-room))
+        y-full-min (- y-min
+                      (* y-range
+                         y-breathing-room))]
     {:x-axis (viz/linear-axis {:domain      [x-min, x-max]
                                :range       [(* margin-frac
                                                 width)
@@ -436,12 +442,8 @@
                                                                " "
                                                                0.0
                                                                ")")}})
-     :y-axis (viz/linear-axis {:domain      [(- y-min
-                                                (* y-range
-                                                   y-breathing-room))
-                                             (+ y-max
-                                                (* y-range
-                                                   y-breathing-room))]
+     :y-axis (viz/linear-axis {:domain      [y-full-min
+                                             y-full-max]
                                :range       [(- height
                                                 (* margin-frac
                                                    height))
@@ -496,9 +498,7 @@
                (some? x-name) (into (quickthing/adjustable-text [[(+ x-min
                                                                            (/ x-range
                                                                               2.0))
-                                                                  (+ y-max
-                                                                       (* y-range
-                                                                          y-breathing-room))
+                                                                  y-full-max
                                                                   x-name
                                                                   {:dy                (/ scale
                                                                                          -3.0)
@@ -510,16 +510,10 @@
                                                                    :text-anchor       "middle"
                                                                    :dominant-baseline "text-bottom"}]]))
                (some? y-name) (into (quickthing/adjustable-text [[x-max
-                                                                 (+ (- y-min
-                                                                          (* y-range
-                                                                             y-breathing-room))
-                                                                    (/ (- (+ y-max
-                                                                             (* y-range
-                                                                                y-breathing-room))
-                                                                          (- y-min
-                                                                             (* y-range
-                                                                                y-breathing-room)))
-                                                                       2.0))
+                                                                  (+ y-full-min
+                                                                     (/ (- y-full-max
+                                                                           y-full-min)
+                                                                        2.0))
                                                                   y-name
                                                                   {:dx                (/ scale
                                                                                          3.0)
