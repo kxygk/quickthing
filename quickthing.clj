@@ -405,9 +405,14 @@
         y-full-max (+ y-max
                       (* y-range
                          y-breathing-room))
-        y-full-min (- y-min
-                      (* y-range
-                         y-breathing-room))]
+        y-full-min (let [y-min-with-buffer (- y-min
+                                              (* y-range
+                                                 y-breathing-room))]
+                     (if (and (>= y-min
+                                  0)
+                              (neg? y-min-with-buffer))
+                       0.0
+                       y-min-with-buffer))]
     {:x-axis (viz/linear-axis {:domain      [x-min, x-max]
                                :range       [(* margin-frac
                                                 width)
