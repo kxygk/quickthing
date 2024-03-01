@@ -382,7 +382,7 @@
        :or   {width            1000
               height           600
               margin-frac      0.15
-              y-breathing-room 1.1
+              y-breathing-room 0.1
               scale            36
               main-color       "black"
               color            "black"}}]]
@@ -436,10 +436,12 @@
                                                                " "
                                                                0.0
                                                                ")")}})
-     :y-axis (viz/linear-axis {:domain      [(* y-min
-                                                y-breathing-room)
-                                             (* y-max
-                                                y-breathing-room)]
+     :y-axis (viz/linear-axis {:domain      [(- y-min
+                                                (* y-range
+                                                   y-breathing-room))
+                                             (+ y-max
+                                                (* y-range
+                                                   y-breathing-room))]
                                :range       [(- height
                                                 (* margin-frac
                                                    height))
@@ -479,11 +481,11 @@
               :minor-x true
               :minor-y true}
      :data   (cond-> []
-               (some? title)  (conj (quickthing/adjustable-text [[x-max
+               (some? title)  (into (quickthing/adjustable-text [[x-max
                                                                   y-max
                                                                   title
                                                                   {:dx                (- (/ scale
-                                                                                            2.0))
+                                                                                            1.0))
                                                                    :dy                (/ scale
                                                                                          2.0)
                                                                    :font-size         scale
@@ -491,32 +493,43 @@
                                                                    :fill              "#0004"
                                                                    :text-anchor       "end"
                                                                    :dominant-baseline "hanging"}]]))
-               (some? x-name) (conj (quickthing/adjustable-text [[(/ x-max
-                                                                     2.0)
-                                                                  0
+               (some? x-name) (into (quickthing/adjustable-text [[(+ x-min
+                                                                           (/ x-range
+                                                                              2.0))
+                                                                  (+ y-max
+                                                                       (* y-range
+                                                                          y-breathing-room))
                                                                   x-name
                                                                   {:dy                (/ scale
-                                                                                         1.5)
+                                                                                         -3.0)
                                                                    :font-size         (/ scale
-                                                                                         2.75)
-                                                                   :fill              main-color
+                                                                                         2.0)
                                                                    :font-family       "Arial, sans-serif"
+                                                                   :font-style "italic"
+                                                                   :fill              main-color
                                                                    :text-anchor       "middle"
-                                                                   :dominant-baseline "hanging"}]]))
-               (some? y-name) (conj (quickthing/adjustable-text [[0
-                                                                  (/ y-max
-                                                                     2.0)
+                                                                   :dominant-baseline "text-bottom"}]]))
+               (some? y-name) (into (quickthing/adjustable-text [[x-max
+                                                                 (/ (- (+ y-max
+                                                                          (* y-range
+                                                                             y-breathing-room))
+                                                                       (- y-min
+                                                                          (* y-range
+                                                                             y-breathing-room))) ;; SEEMS JITTERY - MAYBE HAS ERROR?
+                                                                    2.0)
                                                                   y-name
                                                                   {:dx                (/ scale
-                                                                                         -1.0)
+                                                                                         3.0)
+                                                                   :dy                (/ scale
+                                                                                         3.0)
                                                                    :writing-mode      "vertical-lr"
                                                                    :text-orientation  "sideways"
                                                                    :font-size         (/ scale
-                                                                                         2.75)
+                                                                                         2.0)
                                                                    :fill              color
                                                                    :font-family       "Arial, sans-serif"
-                                                                   :text-anchor       "middle"
-                                                                   :dominant-baseline "bottom"}]])))}))
+                                                                   :font-style "italic"
+                                                                   :text-anchor       "middle"}]])))}))
 
 (defn
   secondary-axis
