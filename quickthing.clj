@@ -510,13 +510,16 @@
                                                                    :text-anchor       "middle"
                                                                    :dominant-baseline "text-bottom"}]]))
                (some? y-name) (into (quickthing/adjustable-text [[x-max
-                                                                 (/ (- (+ y-max
+                                                                 (+ (- y-min
                                                                           (* y-range
                                                                              y-breathing-room))
-                                                                       (- y-min
-                                                                          (* y-range
-                                                                             y-breathing-room))) ;; SEEMS JITTERY - MAYBE HAS ERROR?
-                                                                    2.0)
+                                                                    (/ (- (+ y-max
+                                                                             (* y-range
+                                                                                y-breathing-room))
+                                                                          (- y-min
+                                                                             (* y-range
+                                                                                y-breathing-room)))
+                                                                       2.0))
                                                                   y-name
                                                                   {:dx                (/ scale
                                                                                          3.0)
