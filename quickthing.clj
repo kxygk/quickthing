@@ -376,11 +376,13 @@
               scale
               x-name ;; names for the axis
               y-name
+              x-ticks
+              y-ticks
               main-color
               color
               title]
-       :or   {width            1000
-              height           600
+       :or   {width            default-width
+              height           default-height
               margin-frac      0.15
               y-breathing-room 0.1
               scale            36
@@ -408,6 +410,7 @@
         y-full-min (let [y-min-with-buffer (- y-min
                                               (* y-range
                                                  y-breathing-room))]
+                     ;; don't add bottom buffer space if you're around zero
                      (if (and (>= y-min
                                   0)
                               (neg? y-min-with-buffer))
@@ -466,6 +469,8 @@
                                                  viz/default-svg-label)
                                :pos         (* margin-frac
                                                width)
+                               :major-size  (/ scale
+                                               3.0)
                                :label-dist  (/ scale
                                                4.0)
                                :label-y     (/ scale
@@ -514,6 +519,23 @@
                                                                    :fill              main-color
                                                                    :text-anchor       "middle"
                                                                    :dominant-baseline "text-bottom"}]]))
+                (some? y-name) (into (quickthing/adjustable-text [[x-min
+                                                                  y-full-max
+                                                                  y-name
+                                                                  {:dx                (/ scale
+                                                                                         2.0)
+                                                                   :dy                (/ scale
+                                                                                         2.0)
+                                                                   ;;:writing-mode      "vertical-lr"
+                                                                   :text-orientation  "sideways"
+                                                                   :font-size         (/ scale
+                                                                                         2.0)
+                                                                   :fill              color
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :font-style "italic"
+                                                                   :text-anchor       "beginning"
+                                                                   :dominant-baseline "hanging"}]]))
+               #_#_ ;; this is the vertival `outside` look
                (some? y-name) (into (quickthing/adjustable-text [[x-max
                                                                   (+ y-full-min
                                                                      (/ (- y-full-max
@@ -556,8 +578,179 @@
               margin-frac      0.15
               y-breathing-room 1.1
               scale            36
-              color            "#0008"
-              main-color       "#0008"}}]]
+              color            "#0088"
+              main-color       "#0088"}}]]
+    (let [xs      (->> data
+                     (map first))
+        ys      (->> data
+                     (map second))
+        x-min   (apply min
+                       xs)
+        x-max   (apply max
+                       xs)
+        y-min   (apply min
+                       ys)
+        y-max   (apply max
+                       ys)
+        x-range (- x-max
+                   x-min)
+        y-range (- y-max
+                   y-min)
+        y-full-max (+ y-max
+                      (* y-range
+                         y-breathing-room))
+        y-full-min (let [y-min-with-buffer (- y-min
+                                              (* y-range
+                                                 y-breathing-room))]
+                     ;; don't add bottom buffer space if you're around zero
+                     (if (and (>= y-min
+                                  0)
+                              (neg? y-min-with-buffer))
+                       0.0
+                       y-min-with-buffer))]
+    {:x-axis (viz/linear-axis {:domain      [x-min, x-max]
+                               :range       [(* margin-frac
+                                                width)
+                                             (- width
+                                                (* margin-frac
+                                                   width))]
+                               :major       (->> x-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10))
+                               :label       (->> x-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10)
+                                                 tick-formatter
+                                                 viz/default-svg-label)
+                               :pos         (* margin-frac
+                                               height)
+                               :label-dist  (/ scale
+                                               -5.75)
+                               :attribs     {:stroke main-color}
+                               :label-style {:fill        "none" #_main-color
+                                             :stroke      "none"
+                                             :font-family "Arial, sans-serif"
+                                             :font-size   (/ scale
+                                                             2.0)
+                                             :text-anchor "start"
+                                             :transform   (str "translate("
+                                                               (/ scale
+                                                                  4.0)
+                                                               " "
+                                                               0.0
+                                                               ")")}})
+     :y-axis (viz/linear-axis {:domain      [y-full-min
+                                             y-full-max]
+                               :range       [(- height
+                                                (* margin-frac
+                                                   height))
+                                             (* margin-frac
+                                                height)]
+                               :major       (->> y-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10))
+                               :label       (->> y-range
+                                                 Math/log10
+                                                 long
+                                                 (Math/pow 10)
+                                                 tick-formatter
+                                                 viz/default-svg-label)
+                               :pos         (- width
+                                               (* margin-frac
+                                                  width))
+                               :major-size  (/ scale
+                                               -3.0)
+                               :label-dist  (/ scale
+                                               -4.0)
+                               :label-y     (/ scale
+                                               -4.0)
+                               :attribs     {:stroke color}
+                               :label-style {:fill        main-color
+                                             :stroke      "none"
+                                             :font-family "Arial, sans-serif"
+                                             :font-size   (/ scale
+                                                             2.0)
+                                             :text-anchor "beginning"}})
+     :attribs {:stroke color
+               :fill color}
+     #_#_
+     :grid   {:attribs {:stroke           "#caa"
+                        :stroke-dasharray (str (/ scale
+                                                  10.0)
+                                               " "
+                                               (/ scale
+                                                  5.0))
+                        :stroke-width     (/ scale
+                                             50.0)}
+              :minor-x true
+              :minor-y true}
+     :data   (cond-> []
+               #_#_
+               (some? title)  (into (quickthing/adjustable-text [[x-max
+                                                                  y-max
+                                                                  title
+                                                                  {:dx                (- (/ scale
+                                                                                            1.0))
+                                                                   :dy                (/ scale
+                                                                                         2.0)
+                                                                   :font-size         scale
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :fill              "#0004"
+                                                                   :text-anchor       "end"
+                                                                   :dominant-baseline "hanging"}]]))
+               #_#_
+               (some? x-name) (into (quickthing/adjustable-text [[(+ x-min
+                                                                           (/ x-range
+                                                                              2.0))
+                                                                  y-full-max
+                                                                  x-name
+                                                                  {:dy                (/ scale
+                                                                                         -3.0)
+                                                                   :font-size         (/ scale
+                                                                                         2.0)
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :font-style "italic"
+                                                                   :fill              main-color
+                                                                   :text-anchor       "middle"
+                                                                   :dominant-baseline "text-bottom"}]]))
+               (some? y-name) (into (quickthing/adjustable-text [[x-max
+                                                                  y-full-min
+                                                                  y-name
+                                                                  {:dx                (/ scale
+                                                                                         -2.0)
+                                                                   :dy                (/ scale
+                                                                                         -2.0)
+                                                                   ;;:writing-mode      "vertical-lr"
+                                                                   :text-orientation  "sideways"
+                                                                   :font-size         (/ scale
+                                                                                         2.0)
+                                                                   :fill              color
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :font-style "italic"
+                                                                   :text-anchor       "end"}]]))
+               #_#_ ;; this is the vertical `outside` look
+               (some? y-name) (into (quickthing/adjustable-text [[x-max
+                                                                  (+ y-full-min
+                                                                     (/ (- y-full-max
+                                                                           y-full-min)
+                                                                        2.0))
+                                                                  y-name
+                                                                  {:dx                (/ scale
+                                                                                         3.0)
+                                                                   :dy                (/ scale
+                                                                                         3.0)
+                                                                   :writing-mode      "vertical-lr"
+                                                                   :text-orientation  "sideways"
+                                                                   :font-size         (/ scale
+                                                                                         2.0)
+                                                                   :fill              color
+                                                                   :font-family       "Arial, sans-serif"
+                                                                   :font-style "italic"
+                                                                   :text-anchor       "middle"}]])))})
+  #_
   (let [xs      (->> data
                      (map first))
         ys      (->> data
@@ -653,7 +846,7 @@
                                              :text-anchor "end"}})
      :data   (cond-> []
                ;; no title on secondary axis
-               (some? y-name) (conj (quickthing/adjustable-text [[x-max
+               (some? y-name) (into (quickthing/adjustable-text [[x-max
                                                                   (+ y-min
                                                                      (/ y-range
                                                                         2.0))
@@ -668,7 +861,7 @@
                                                                    :font-family       "Arial, sans-serif"
                                                                    :text-anchor       "middle"
                                                                    :dominant-baseline "bottom"}]]))
-               (some? x-name) (conj (quickthing/adjustable-text [[(/ x-range
+               (some? x-name) (into (quickthing/adjustable-text [[(/ x-range
                                                                      2.0)
                                                                   y-max
                                                                   x-name
