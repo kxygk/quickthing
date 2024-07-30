@@ -626,6 +626,8 @@
                                                  viz/default-svg-label)
                                :pos         (* margin-frac
                                                height)
+                               :major-size  0 #_(/ scale
+                                                   -6.0)
                                :label-dist  (/ scale
                                                -5.75)
                                :attribs     {:stroke main-color}
@@ -717,12 +719,12 @@
                                                                    :text-anchor       "middle"
                                                                    :dominant-baseline "text-bottom"}]]))
                (some? y-name) (into (quickthing/adjustable-text [[x-max
-                                                                  y-full-min
+                                                                  y-full-max
                                                                   y-name
                                                                   {:dx                (/ scale
                                                                                          -2.0)
                                                                    :dy                (/ scale
-                                                                                         -2.0)
+                                                                                         2.0)
                                                                    ;;:writing-mode      "vertical-lr"
                                                                    :text-orientation  "sideways"
                                                                    :font-size         (/ scale
@@ -730,7 +732,8 @@
                                                                    :fill              color
                                                                    :font-family       "Arial, sans-serif"
                                                                    :font-style "italic"
-                                                                   :text-anchor       "end"}]]))
+                                                                   :text-anchor       "end"
+                                                                   :dominant-baseline "hanging"}]]))
                #_#_ ;; this is the vertical `outside` look
                (some? y-name) (into (quickthing/adjustable-text [[x-max
                                                                   (+ y-full-min
