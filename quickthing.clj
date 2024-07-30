@@ -393,7 +393,7 @@
               title]
        :or   {width            default-width
               height           default-height
-              margin-frac      0.15
+              margin-frac      0.05
               y-breathing-room 0.1
               scale            36
               main-color       "black"
@@ -585,7 +585,7 @@
               main-color]
        :or   {width            default-width
               height           default-height
-              margin-frac      0.15
+              margin-frac      0.05
               y-breathing-room 0.1
               scale            36
               color            "#0088"
