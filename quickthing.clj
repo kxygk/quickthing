@@ -129,6 +129,16 @@
                                 ">\n<"))))
 
 (defn
+  svg-title
+  "adding the `title` element
+  useful for tooltips
+  https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title "
+  [text]
+  [:title
+   nil
+   text])
+
+(defn
   adjustable-text
   "add a customizable text display
   `data` is a vector of [x,y,text,attribs]"
@@ -892,13 +902,19 @@
                     _ ;; data-y
                     r
                     inner-attribs]]]
-               (svg/circle [plot-x, plot-y]
-                           (if (nil? r)
-                             (/ scale
-                                3.0)
-                             r)
-                           (merge attribs ;; point-specific `:attribs` overwrite
-                                  inner-attribs)))
+               (let [tooltip (:tooltip inner-attribs)
+                     circle (svg/circle [plot-x, plot-y]
+                                        (if (nil? r)
+                                          (/ scale
+                                             3.0)
+                                          r)
+                                        (merge attribs ;; point-specific `:attribs` overwrite
+                                               inner-attribs))]
+                 (if (nil? tooltip)
+                   circle
+                   (svg/group {}
+                              circle
+                              (svg-title tooltip)))))
      :layout viz/svg-scatter-plot}])
 
 (defn-
