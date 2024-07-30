@@ -576,7 +576,7 @@
        :or   {width            default-width
               height           default-height
               margin-frac      0.15
-              y-breathing-room 1.1
+              y-breathing-room 0.1
               scale            36
               color            "#0088"
               main-color       "#0088"}}]]
