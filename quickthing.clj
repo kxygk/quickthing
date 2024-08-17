@@ -154,16 +154,22 @@
                    _ ;; data-y
                    text        ;; "extra" provided data
                    inner-attribs]]]
-              (svg/text [plot-x, plot-y]
-                        (str text)
-                        (merge {:fill              "#444"
-                                :stroke            "none"
-                                :text-anchor       "middle"
-                                :dominant-baseline "central"
-                                :font-size         (/ scale
-                                                      3.0)}
-                               inner-attribs
-                               attribs)))
+              (let [tooltip (:tooltip inner-attribs)
+                    text-element (svg/text [plot-x, plot-y]
+                                           (str text)
+                                           (merge {:fill              "#444"
+                                                   :stroke            "none"
+                                                   :text-anchor       "middle"
+                                                   :dominant-baseline "central"
+                                                   :font-size         (/ scale
+                                                                         3.0)}
+                                                  inner-attribs
+                                                  attribs))]
+                (if (nil? tooltip)
+                  text-element
+                  (svg/group {}
+                             text-element
+                             (svg-title tooltip)))))
     :layout viz/svg-scatter-plot}])
 
 (defn
