@@ -526,8 +526,7 @@
                                                                               2.0))
                                                                   y-full-max
                                                                   x-name
-                                                                  {:dy                (/ scale
-                                                                                         -3.0)
+                                                                  {:dy                0
                                                                    :font-size         (/ scale
                                                                                          2.0)
                                                                    :font-family       "Arial, sans-serif"
