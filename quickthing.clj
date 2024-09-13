@@ -978,6 +978,107 @@
                     attribs)
     :layout  svg-trueline-plot}])
 
+
+(defn
+  error-bars
+  "Error bars are drawn on x y values
+  Error can be specified with single values or double (for asymmetric bars)
+  [x, y, x-err, y-err]
+  [x, y, [x-err-neg, x-err-pos], [y-err-neg, y-err-pos]]
+  Where the sigle `x-err` is a one sided error
+  NOTE: Maybe doesn't work correctly on logarithmic plots?
+  "
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}
+       :as   options}]]
+  (->> data
+       (map (fn [[x, y, x-err, y-err]]
+              (into (adjustable-circles (->> data
+                                             (mapv #(take 2
+                                                          %)))
+                                        (-> options
+                                            (assoc-in [:attribs
+                                                       :fill]
+                                                      "black")
+                                            (update :scale
+                                                    #(/ %
+                                                         10.0))))
+                    (into (if (nil? x-err)
+                            []
+                            (let [x-start (- x
+                                             (if (seq? x-err)
+                                               (first x-err)
+                                               x-err))
+                                  x-end   (+ x
+                                             (if (seq? x-err)
+                                               (second x-err)
+                                               x-err))]
+                              [{:values  [[x-start, y]
+                                          [x-end, y]]
+                                :attribs (merge {#_#_:stroke-dasharray (str (/ scale
+                                                                               10.0)
+                                                                            " "
+                                                                            (/ scale
+                                                                               10.0))
+                                                 :stroke-width         (/ scale
+                                                                          50.0)
+                                                 :stroke               "black"}
+                                                attribs)
+                                :layout  svg-trueline-plot}]))
+                          (if (nil? y-err)
+                            []
+                            (let [y-start (- y
+                                             (if (seq? y-err)
+                                               (first y-err)
+                                               y-err))
+                                  y-end   (+ y
+                                             (if (seq? y-err)
+                                               (second y-err)
+                                               x-err))]
+                              [{:values  [[x, y-start]
+                                          [x, y-end]]
+                                :attribs (merge {#_#_:stroke-dasharray (str (/ scale
+                                                                               10.0)
+                                                                            " "
+                                                                            (/ scale
+                                                                               10.0))
+                                                 :stroke-width         (/ scale
+                                                                          50.0)
+                                                 :stroke               "black"}
+                                                attribs)
+                                :layout  svg-trueline-plot}]))))))))
+#_
+(error-bars [[0 1 1 1]
+             [1 1 1 1]
+             [2 3 2 2]])
+;; => ([{:values [[-1 1] [1 1]],
+;;       :attribs
+;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :layout #function[quickthing/svg-trueline-plot]}
+;;      {:values [[0 0] [0 2]],
+;;       :attribs
+;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :layout #function[quickthing/svg-trueline-plot]}]
+;;     [{:values [[0 1] [2 1]],
+;;       :attribs
+;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :layout #function[quickthing/svg-trueline-plot]}
+;;      {:values [[1 0] [1 2]],
+;;       :attribs
+;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :layout #function[quickthing/svg-trueline-plot]}]
+;;     [{:values [[0 3] [4 3]],
+;;       :attribs
+;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :layout #function[quickthing/svg-trueline-plot]}
+;;      {:values [[2 1] [2 5]],
+;;       :attribs
+;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :layout #function[quickthing/svg-trueline-plot]}])
+
 #_
 (defn
   events-2-rates
