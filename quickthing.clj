@@ -1037,7 +1037,7 @@
                                   y-end   (+ y
                                              (if (seq? y-err)
                                                (second y-err)
-                                               x-err))]
+                                               y-err))]
                               [{:values  [[x, y-start]
                                           [x, y-end]]
                                 :attribs (merge {#_#_:stroke-dasharray (str (/ scale
