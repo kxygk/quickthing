@@ -1003,9 +1003,9 @@
                                             (assoc-in [:attribs
                                                        :fill]
                                                       "black")
-                                            (update :scale
-                                                    #(/ %
-                                                        10.0))))
+                                            (assoc :scale
+                                                    (/ scale
+                                                       10.0))))
                     (into (if (nil? x-err)
                             []
                             (let [x-start (- x
