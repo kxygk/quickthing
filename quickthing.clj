@@ -978,6 +978,71 @@
                     attribs)
     :layout  svg-trueline-plot}])
 
+(defn
+  polyline
+  "Given a vector of polunomial factors
+  Draw a line
+  TODO: For now only supports y = ax + b
+  But leaving room to expand this to more polynomials
+  when i have time.."
+  [reference-xy-data
+   polynomial-factors-vec
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}}]]
+  (if (or (nil? reference-xy-data)
+          (nil? polynomial-factors-vec)
+          (empty? polynomial-factors-vec)
+          (empty? reference-xy-data) ;;#_#_
+          (->> polynomial-factors-vec
+               (not-every? some?))
+          (->> reference-xy-data
+               (not-every? some?)))
+    []
+    (let [[b a] polynomial-factors-vec
+          xs    (->> reference-xy-data
+                     (mapv first))
+          ys    (->> reference-xy-data
+                     (mapv second))]
+      (let [x-min (apply min
+                         xs)
+            x-max (apply max
+                         xs)
+            y-min (apply min
+                         ys)
+            y-max (apply max
+                         ys)]
+        (let [y4x-min (+ (* a
+                            x-min)
+                         b)
+              y4x-max (+ (* a
+                            x-max)
+                         b)]
+          (let [two-end-points [(if (> y4x-min
+                                       y-min)
+                                  [x-min
+                                   y4x-min]
+                                  [(/ (- y-min
+                                         b)
+                                      a)
+                                   y-min])
+                                (if (< y4x-max
+                                       y-max)
+                                  [x-max
+                                   y4x-max]
+                                  [(/ (- y-max
+                                         b)
+                                      a)
+                                   y-max])]]
+            [{:values  two-end-points
+              :attribs (merge {:stroke-width (/ scale
+                                                10.0)
+                               :stroke       "#aaa"}
+                              attribs)
+              :layout  svg-trueline-plot}]))))))
+#_
+(polyline [[0 0] [9000 100]] [10.0 1.0])
 
 (defn
   error-bars
