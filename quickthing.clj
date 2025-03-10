@@ -173,6 +173,9 @@
                              (svg-title tooltip)))))
     :layout viz/svg-scatter-plot}])
 
+#_
+(format "%.2G" 9900.0)
+;; => "1.8E+03"
 (defn
   tick-formatter
   "Returns a function that formats a value to a given spacing
@@ -183,12 +186,17 @@
   (let [power (Math/log10
                 tick-spacing)]
     (fn [tick-value]
+      (if (> (abs tick-value)
+             10000)
+        (->> tick-value
+             (format "%.2G")
+             str)
       (str ((viz/value-formatter (if (neg? power)
                                    (-> power
                                        Math/abs
                                        long)
                                    0))
-            tick-value)))))
+            tick-value))))))
 
 (defn
   zero-axis
