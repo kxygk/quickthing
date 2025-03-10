@@ -923,6 +923,25 @@
                                                                    :dominant-baseline "bottom"}]])))}))
 
 (defn
+  no-axis
+  [data
+   & options]
+  (-> data
+      (primary-axis #_ (-> options
+                        (assoc :margin-frac
+                               0)))
+      (assoc-in [:x-axis
+                 :visible]
+                false)
+      (assoc-in [:y-axis
+                 :visible]
+                false)
+      (assoc-in [:grid]
+                false)
+      (assoc-in [:grid]
+                false)))
+
+(defn
   adjustable-circles
   "Draws circles.."
   [data
