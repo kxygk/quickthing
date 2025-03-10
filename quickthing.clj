@@ -1007,6 +1007,25 @@
                   (:attribs d-spec)))
 
 (defn
+  solid-line
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}}]]
+  [{:values  data
+    :attribs (merge {#_#_:stroke-dasharray (str (/ scale
+                                               10.0)
+                                            " "
+                                            (/ scale
+                                               10.0))
+                     :stroke-width     (/ scale
+                                          10.0)
+                     :stroke           "#aaa"}
+                    attribs)
+    :layout  svg-trueline-plot}])
+
+(defn
   dashed-line
   [data
    & [{:keys [attribs
