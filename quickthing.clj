@@ -413,6 +413,7 @@
               title]
        :or   {width            default-width
               height           default-height
+              logarithmic-y?   false
               margin-frac      nil
               y-breathing-room 0.1
               scale            36
@@ -422,6 +423,9 @@
                       (/ scale
                          400.0)
                       margin-frac)
+        y-axis-func (if logarithmic-y?
+                      viz/log-axis
+                      viz/linear-axis)
         xs         (->> data
                         (map first))
         ys         (->> data
@@ -445,11 +449,13 @@
                                               (* y-range
                                                  y-breathing-room))]
                      ;; don't add bottom buffer space if you're around zero
-                     (if (and (>= y-min
-                                  0)
-                              (neg? y-min-with-buffer))
+                     (if logarithmic-y?
+                       y-min
+                       (if (and (>= y-min
+                                    0)
+                                (neg? y-min-with-buffer))
                        0.0
-                       y-min-with-buffer))]
+                       y-min-with-buffer)))]
     {:x-axis (viz/linear-axis {:domain      [x-min, x-max]
                                :range       [(* margin-frac
                                                 width)
@@ -484,7 +490,7 @@
                                                                " "
                                                                0.0
                                                                ")")}})
-     :y-axis (viz/linear-axis {:domain      [y-full-min
+     :y-axis (y-axis-func {:domain      [y-full-min
                                              y-full-max]
                                :range       [(- height
                                                 (* margin-frac
