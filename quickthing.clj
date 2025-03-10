@@ -214,10 +214,14 @@
               title]
        :or   {width       default-width
               height      default-height
-              margin-frac 0.15
+              margin-frac nil
               scale       36
               color       "#0008"}}]]
-  (let [xs      (->> data
+  (let [margin-frac (if (nil? margin-frac)
+                      (/ scale
+                         100.0)
+                      margin-frac)
+        xs      (->> data
                      (map first))
         ys      (->> data
                      (map second))
@@ -396,6 +400,7 @@
   [data
    & [{:keys [width
               height
+              logarithmic-y?
               margin-frac
               y-breathing-room
               scale
@@ -408,12 +413,16 @@
               title]
        :or   {width            default-width
               height           default-height
-              margin-frac      0.05
+              margin-frac      nil
               y-breathing-room 0.1
               scale            36
               main-color       "black"
               color            "black"}}]]
-  (let [xs         (->> data
+  (let [margin-frac (if (nil? margin-frac)
+                      (/ scale
+                         400.0)
+                      margin-frac)
+        xs         (->> data
                         (map first))
         ys         (->> data
                         (map second))
@@ -599,12 +608,16 @@
               main-color]
        :or   {width            default-width
               height           default-height
-              margin-frac      0.05
+              margin-frac      nil
               y-breathing-room 0.1
               scale            36
               color            "#0088"
               main-color       "#0088"}}]]
-  (let [xs         (->> data
+  (let [margin-frac (if (nil? margin-frac)
+                      (/ scale
+                         400.0)
+                      margin-frac)
+        xs         (->> data
                         (map first))
         ys         (->> data
                         (map second))
