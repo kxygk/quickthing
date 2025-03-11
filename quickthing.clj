@@ -655,28 +655,28 @@
                       (/ scale
                          400.0)
                       margin-frac)
-        xs         (->> data
+        xs          (->> data
                         (map first))
-        ys         (->> data
+        ys          (->> data
                         (map second))
-        x-min      (apply min
+        x-min       (apply min
                           xs)
-        x-max      (apply max
+        x-max       (apply max
                           xs)
-        y-min      (apply min
+        y-min       (apply min
                           ys)
-        y-max      (apply max
+        y-max       (apply max
                           ys)
-        x-range    (- x-max
+        x-range     (- x-max
                       x-min)
-        y-range    (- y-max
+        y-range     (- y-max
                       y-min)
-        y-full-max (+ y-max
+        y-full-max  (+ y-max
                       (* y-range
                          y-breathing-room))
-        y-full-min (let [y-min-with-buffer (- y-min
-                                              (* y-range
-                                                 y-breathing-room))]
+        y-full-min  (let [y-min-with-buffer (- y-min
+                                               (* y-range
+                                                  y-breathing-room))]
                      ;; don't add bottom buffer space if you're around zero
                      (if (and (>= y-min
                                   0)
