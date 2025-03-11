@@ -541,7 +541,7 @@
                                         {:dx                (- (/ scale
                                                                   1.0))
                                          :dy                (/ scale
-                                                               2.0)
+                                                               1.0)
                                          :font-size         scale
                                          :font-family       "Arial, sans-serif"
                                          :fill              "#0004"
