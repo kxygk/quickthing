@@ -554,15 +554,16 @@
                                           [legend-text
                                            legend-attribs]]
                                          (adjustable-text [[x-min
-                                                            y-full-max
+                                                            (* y-full-max
+                                                               0.999)
                                                             legend-text
                                                             (merge {:dx                (/ scale
                                                                                           3.0)
                                                                     :dy                (*  (+ row
-                                                                                              4)
+                                                                                              0.8)
                                                                                            (/ scale
                                                                                               3.0))
-                                                                    :text-orientation  "sideways"
+                                                                    ;;:text-orientation  "sideways"
                                                                     :font-size         (/ scale
                                                                                           3.0)
                                                                     :fill              color
@@ -578,7 +579,8 @@
                (into (adjustable-text [[(+ x-min
                                            (/ x-range
                                               2.0))
-                                        y-full-max
+                                        (* y-full-max
+                                           0.999)
                                         x-name
                                         {:dy                (/ scale
                                                                -4.0)
@@ -591,7 +593,8 @@
                                          :dominant-baseline "text-bottom"}]]))
                (some? y-name)
                (into (adjustable-text [[x-min
-                                        y-full-max
+                                        (* y-full-max
+                                           0.999)
                                         y-name
                                         {:dx                (/ scale
                                                                2.0)
