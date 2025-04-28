@@ -570,10 +570,10 @@
                                                                                              2.0)
                                                                                           (*  row
                                                                                               (/ scale
-                                                                                                 2.0)))
+                                                                                                 1.5)))
                                                                     ;;:text-orientation  "sideways"
                                                                     :font-size         (/ scale
-                                                                                          3.0)
+                                                                                          2.0)
                                                                     :fill              color
                                                                     #_#_:font-family
                                                                     "Arial, sans-serif"
