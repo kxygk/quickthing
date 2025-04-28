@@ -519,7 +519,7 @@
                            :label-y     (/ scale
                                            -4.0)
                            :attribs     {:stroke color}
-                           :label-style {:fill        main-color
+                           :label-style {:fill        color
                                          :stroke      "none"
                                          :font-family "Arial, sans-serif"
                                          :font-size   (/ scale
@@ -752,7 +752,7 @@
                                 :label-y     (/ scale
                                                 -4.0)
                                 :attribs     {:stroke color}
-                                :label-style {:fill        main-color
+                                :label-style {:fill        color
                                               :stroke      "none"
                                               :font-family "Arial, sans-serif"
                                               :font-size   (/ scale
