@@ -501,10 +501,12 @@
                            :major       (->> y-range
                                              Math/log10
                                              long
+                                             dec
                                              (Math/pow 10))
                            :label       (->> y-range
                                              Math/log10
                                              long
+                                             dec
                                              (Math/pow 10)
                                              tick-formatter
                                              viz/default-svg-label)
@@ -731,10 +733,12 @@
                                 :major       (->> y-range
                                                   Math/log10
                                                   long
+                                                  dec
                                                   (Math/pow 10))
                                 :label       (->> y-range
                                                   Math/log10
                                                   long
+                                                  dec
                                                   (Math/pow 10)
                                                   tick-formatter
                                                   viz/default-svg-label)
