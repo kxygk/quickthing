@@ -456,7 +456,9 @@
                                      0)
                                  (neg? y-min-with-buffer))
                           0.0
-                          y-min-with-buffer)))]
+                          y-min-with-buffer)))
+        y-full-range (- y-full-max
+                        y-full-min)]
     {:x-axis (viz/linear-axis {:domain      [x-min, x-max]
                                :range       [(* margin-frac
                                                 width)
@@ -555,16 +557,20 @@
                                          [row
                                           [legend-text
                                            legend-attribs]]
-                                         (adjustable-text [[x-min
-                                                            (* y-full-max
-                                                               0.999)
+                                         (adjustable-text [[(+ x-min
+                                                               (* x-range
+                                                                  0.001))
+                                                            (- y-full-max
+                                                               (* y-full-range
+                                                                  0.0001))
                                                             legend-text
                                                             (merge {:dx                (/ scale
-                                                                                          3.0)
-                                                                    :dy                (*  (+ row
-                                                                                              0.8)
-                                                                                           (/ scale
-                                                                                              3.0))
+                                                                                          2.0)
+                                                                    :dy                (+ (/ scale
+                                                                                             2.0)
+                                                                                          (*  row
+                                                                                              (/ scale
+                                                                                                 2.0)))
                                                                     ;;:text-orientation  "sideways"
                                                                     :font-size         (/ scale
                                                                                           3.0)
