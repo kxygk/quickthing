@@ -467,11 +467,11 @@
                                                    width))]
                                :major       (->> x-range
                                                  Math/log10
-                                                 long
+                                                 Math/floor
                                                  (Math/pow 10))
                                :label       (->> x-range
                                                  Math/log10
-                                                 long
+                                                 Math/floor
                                                  (Math/pow 10)
                                                  tick-formatter
                                                  viz/default-svg-label)
@@ -502,13 +502,11 @@
                                             height)]
                            :major       (->> y-range
                                              Math/log10
-                                             long
-                                             dec
+                                             Math/floor
                                              (Math/pow 10))
                            :label       (->> y-range
                                              Math/log10
-                                             long
-                                             dec
+                                             Math/floor
                                              (Math/pow 10)
                                              tick-formatter
                                              viz/default-svg-label)
