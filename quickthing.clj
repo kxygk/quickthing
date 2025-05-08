@@ -1570,7 +1570,6 @@
          adjusted-plots]  (reduce (fn [[horizontal-offset
                                         horizontal-plots]
                                        next-plot]
-                                    (println horizontal-offset)
                                     (let [next-plot-width (-> next-plot
                                                               (get 1)
                                                               :width)
