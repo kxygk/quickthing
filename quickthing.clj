@@ -1227,30 +1227,33 @@
 (error-bars [[0 1 1 1]
              [1 1 1 1]
              [2 3 2 2]])
-;; => ([{:values [[-1 1] [1 1]],
-;;       :attribs
-;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;; => [[{:values [(0 1) (1 1) (2 3)],
+;;       :shape #function[quickthing/adjustable-circles/fn--50652],
+;;       :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
+;;      {:values [[-1 1] [1 1]],
+;;       :attribs {:stroke-width 0.72, :stroke "black"},
 ;;       :layout #function[quickthing/svg-trueline-plot]}
 ;;      {:values [[0 0] [0 2]],
-;;       :attribs
-;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :attribs {:stroke-width 0.72, :stroke "black"},
 ;;       :layout #function[quickthing/svg-trueline-plot]}]
-;;     [{:values [[0 1] [2 1]],
-;;       :attribs
-;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;     [{:values [(0 1) (1 1) (2 3)],
+;;       :shape #function[quickthing/adjustable-circles/fn--50652],
+;;       :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
+;;      {:values [[0 1] [2 1]],
+;;       :attribs {:stroke-width 0.72, :stroke "black"},
 ;;       :layout #function[quickthing/svg-trueline-plot]}
 ;;      {:values [[1 0] [1 2]],
-;;       :attribs
-;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;       :attribs {:stroke-width 0.72, :stroke "black"},
 ;;       :layout #function[quickthing/svg-trueline-plot]}]
-;;     [{:values [[0 3] [4 3]],
-;;       :attribs
-;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
+;;     [{:values [(0 1) (1 1) (2 3)],
+;;       :shape #function[quickthing/adjustable-circles/fn--50652],
+;;       :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
+;;      {:values [[0 3] [4 3]],
+;;       :attribs {:stroke-width 0.72, :stroke "black"},
 ;;       :layout #function[quickthing/svg-trueline-plot]}
 ;;      {:values [[2 1] [2 5]],
-;;       :attribs
-;;       {:stroke-dasharray "3.6 3.6", :stroke-width 3.6, :stroke "#aaa"},
-;;       :layout #function[quickthing/svg-trueline-plot]}])
+;;       :attribs {:stroke-width 0.72, :stroke "black"},
+;;       :layout #function[quickthing/svg-trueline-plot]}]]
 
 #_
 (defn
