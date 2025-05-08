@@ -1012,6 +1012,37 @@
                              (svg-title tooltip)))))
     :layout viz/svg-scatter-plot}])
 
+;; DOESN"T QUITE WORK: b/c the `err-x` and `err-y` are in SVG coordinates.
+;; They aren't in the plotting data coordinates
+#_
+(defn
+  adjustable-ellipses
+  "Draws circles.."
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}}]]
+  [{:values data
+    :shape  (fn [[[plot-x, plot-y]
+                  [_ ;; data-x
+                   _ ;; data-y
+                   err-x
+                   err-y
+                   inner-attribs]]]
+              (let [tooltip (:tooltip inner-attribs)
+                    circle  (svg/ellipse [plot-x, plot-y]
+                                         err-x
+                                         err-y
+                                        (merge attribs ;; point-specific `:attribs` overwrite
+                                               inner-attribs))]
+                (if (nil? tooltip)
+                  circle
+                  (svg/group {}
+                             circle
+                             (svg-title tooltip)))))
+    :layout viz/svg-scatter-plot}])
+
 (defn-
   process-points-less
   "Based on `process-points` from `geom/viz`
