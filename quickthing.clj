@@ -1168,7 +1168,7 @@
               scale   36}
        :as   options}]]
   (->> data
-       (map (fn [[x, y, x-err, y-err]]
+       (mapv (fn [[x, y, x-err, y-err]]
               (into (adjustable-circles (->> data
                                              (mapv #(take 2
                                                           %)))
