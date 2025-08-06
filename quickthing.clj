@@ -1662,6 +1662,77 @@
                 color)))
        (mapv #(apply col/rgba
                      %))))
+#_
+(identity red-blue-colors)
+#_
+(count red-blue-colors)
+#_
+(col/rgba 0 0 0 0)
+
+(def
+  purple-yellow
+  "Goes from Yellow to purple.
+  However the zero point is set to black.
+  This is for if there is a mask"
+  (assoc (->> "colorcet/CET-L17.csv"
+              io/resource ;; loads from local classpath
+              slurp
+              csv/read-csv
+              (map
+                (fn [color]
+                  (map #(Double/parseDouble
+                          %)
+                       color)))
+              (mapv #(apply col/rgba
+                            %)))
+         0
+         (col/rgba 0 0 0 0)))
+#_
+(identity purple-yellow)
+
+(def
+  rainbow
+  "Rainbow pallet, with firt and last values black"
+  (let [rainbow (->> "colorcet/CET-R2.csv"
+                     io/resource ;; loads from local classpath
+                     slurp
+                     csv/read-csv
+                     (map
+                       (fn [color]
+                         (map #(Double/parseDouble
+                                 %)
+                              color)))
+                     (mapv #(apply col/rgba
+                                   %)))]
+    (-> rainbow
+        (assoc 0
+               (col/rgba 0 0 0 1.0))
+        (assoc (-> rainbow
+                   count
+                   dec)
+               (col/rgba 0 0 0 1.0)))))
+#_
+(identity rainbow)
+
+(defn
+  from-colorvec
+  "Given a 0-1 value
+  Find the equivalent in a vector of colors"
+  [color-vec
+   fraction]
+  (let [num-colors (count color-vec)]
+    (if (= fraction
+           1.0)
+      (last color-vec)
+      (->> fraction
+           (* num-colors)
+           floor
+           int
+           (get color-vec)))))
+#_
+(from-colorvec red-blue-colors
+               0.7)
+;; => {:r 0.924, :g 0.624, :b 0.551, :a 1.0}
 
 (defn
   group-plots-row
