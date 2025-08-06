@@ -1406,6 +1406,54 @@
 (vector2d [1.0
            1.0])
 #_
+(quickthing/zero-axis [[ 2.0,  2.0]
+                                [-2.0, -2.0]])
+;; => {:x-axis
+;;     {:scale #function[thi.ng.geom.viz.core/linear-scale/fn--49576],
+;;      :major-size 10,
+;;      :pos 300.0,
+;;      :major (-2.0 -1.0 0.0 1.0 2.0),
+;;      :label-dist 20.571428571428573,
+;;      :attribs {:stroke "#000f", :stroke-width 18/5},
+;;      :label #function[thi.ng.geom.viz.core/default-svg-label/fn--49548],
+;;      :label-style
+;;      {:fill "black",
+;;       :stroke "none",
+;;       :font-family "Arial, sans-serif",
+;;       :font-size 18.0,
+;;       :text-anchor "start",
+;;       :transform "translate(9.0 0.0)"},
+;;      :minor nil,
+;;      :domain [-2.18 2.18],
+;;      :minor-size 5,
+;;      :visible true,
+;;      :range [90.0 910.0]},
+;;     :y-axis
+;;     {:scale #function[thi.ng.geom.viz.core/linear-scale/fn--49576],
+;;      :major-size 10,
+;;      :pos 500.0,
+;;      :major (-2.0 -1.0 0.0 1.0 2.0),
+;;      :label-dist 9.0,
+;;      :attribs {:stroke "#000f", :stroke-width 18/5},
+;;      :label #function[thi.ng.geom.viz.core/default-svg-label/fn--49548],
+;;      :label-style
+;;      {:fill "black",
+;;       :stroke "none",
+;;       :font-family "Arial, sans-serif",
+;;       :font-size 18.0,
+;;       :text-anchor "end"},
+;;      :minor nil,
+;;      :domain [-2.18 2.18],
+;;      :minor-size 5,
+;;      :label-y -9.0,
+;;      :visible true,
+;;      :range [600 0]},
+;;     :grid
+;;     {:attribs
+;;      {:stroke "#caa", :stroke-dasharray "3.6 7.2", :stroke-width 0.72},
+;;      :minor-x true,
+;;      :minor-y true},
+;;     :data []}#_
 (->> (-> (quickthing/zero-axis [[ 2.0,  2.0]
                                 [-2.0, -2.0]])
          (assoc :data
