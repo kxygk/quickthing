@@ -260,16 +260,21 @@
                                    x-range)
                                  (* x-range
                                     margin-frac))]
-                :range       [0, width]
+                :range       [(* margin-frac
+                                 width)
+                              (- width
+                                 (* margin-frac
+                                    width))]
                 :major       (->> x-range
                                   Math/log10
                                   long
                                   (Math/pow 10))
-                :label       (viz/default-svg-label (->> x-range
-                                                         Math/log10
-                                                         long
-                                                         (Math/pow 10)
-                                                         tick-formatter))
+                :label       (->> x-range
+                                  Math/log10
+                                  Math/floor
+                                  (Math/pow 10)
+                                  tick-formatter
+                                  viz/default-svg-label)
                 :pos         (let [data-height (/ height
                                                   (+ 1.0
                                                      (* 2.0
@@ -283,6 +288,9 @@
                                       offset)
                                    (/ height
                                       2.0))))
+                :attribs     {:stroke color
+                              :stroke-width (/ scale
+                                               10)}
                 :label-dist  (/ scale
                                 1.75)
                 :label-style {:fill        "black"
@@ -312,26 +320,31 @@
                               0]
                 :major       (->> y-range
                                   Math/log10
-                                  long
+                                  Math/floor
                                   (Math/pow 10))
-                :label       (viz/default-svg-label (->> y-range
-                                                         Math/log10
-                                                         long
-                                                         (Math/pow 10)
-                                                         tick-formatter))
+                :label       (->> x-range
+                                  Math/log10
+                                  Math/floor
+                                  (Math/pow 10)
+                                  tick-formatter
+                                  viz/default-svg-label)
                 :pos         (let [data-width (/ width
                                                  (+ 1.0
                                                     (* 2.0
                                                        margin-frac)))
                                    offset     (* margin-frac
-                                                 data-width)]
+                                                 width)]
                                (if (zero? x-max)
                                  (- width
-                                    offset)
+                                    (* 2.0
+                                       offset))
                                  (if (zero? x-min)
                                    offset
                                    (/ width
                                       2.0))))
+                :attribs     {:stroke color
+                              :stroke-width (/ scale
+                                               10)}
                 :label-dist  (/ scale
                                 4.0)
                 :label-y     (/ scale
@@ -354,42 +367,90 @@
               :minor-x true
               :minor-y true}
      :data   (cond-> []
-               (some? title)  (conj (adjustable-text[[x-max
-                                                                 y-max
-                                                                 title
-                                                                 {:dx                (- (/ scale
-                                                                                           2.0))
-                                                                  :dy                (/ scale
-                                                                                        2.0)
-                                                                  :font-size         scale
-                                                                  :font-family       "Arial, sans-serif"
-                                                                  :fill              "#0004"
-                                                                  :text-anchor       "end"
-                                                                  :dominant-baseline "hanging"}]]))
-               (some? x-name) (conj (adjustable-text [[(/ x-max
-                                                                     2.0)
-                                                                  0
-                                                                  x-name
-                                                                  {:dy                (/ scale
-                                                                                         1.5)
-                                                                   :font-size         (/ scale
-                                                                                         2.75)
-                                                                   :font-family       "Arial, sans-serif"
-                                                                   :text-anchor       "middle"
-                                                                   :dominant-baseline "hanging"}]]))
-               (some? y-name) (conj (adjustable-text [[0
-                                                                  (/ y-max
-                                                                     2.0)
-                                                                  y-name
-                                                                  {:dx                (/ scale
-                                                                                         -1.0)
-                                                                   :writing-mode      "vertical-lr"
-                                                                   :text-orientation  "sideways"
-                                                                   :font-size         (/ scale
-                                                                                         2.75)
-                                                                   :font-family       "Arial, sans-serif"
-                                                                   :text-anchor       "middle"
-                                                                   :dominant-baseline "bottom"}]])))}))
+               (some? title)
+               (into (adjustable-text [[x-max
+                                        y-max
+                                        title
+                                        {:dx                (- (/ scale
+                                                                  1.0))
+                                         :dy                (/ scale
+                                                               1.0)
+                                         :font-size         scale
+                                         :font-family       "Arial, sans-serif"
+                                         :fill              "#0004"
+                                         :stroke-width (/ scale
+                                                          30.0)
+                                         :text-anchor       "end"
+                                         :dominant-baseline "hanging"}]]))
+                (some? legend)
+               (into (->> legend
+                          (map-indexed (fn add-legend-item
+                                         [row
+                                          [legend-text
+                                           legend-attribs]]
+                                         (adjustable-text [[(+ x-min
+                                                               (* x-range
+                                                                  0.001))
+                                                            (- y-max
+                                                               (* y-range
+                                                                  0.0001))
+                                                            legend-text
+                                                            (merge {:dx                (/ scale
+                                                                                          2.0)
+                                                                    :dy                (+ (* scale
+                                                                                             1.5)
+                                                                                          (*  row
+                                                                                              (/ scale
+                                                                                                 1.5)))
+                                                                    ;;:text-orientation  "sideways"
+                                                                    :font-size         (/ scale
+                                                                                          2.0)
+                                                                    :fill              color
+                                                                    :stroke-width (/ scale
+                                                                                     100.0)
+                                                                    :stroke "#000f"
+                                                                    #_#_:font-family
+                                                                    "Arial, sans-serif"
+                                                                    :font-style        "italic"
+                                                                    :text-anchor       "beginning"
+                                                                    :dominant-baseline "hanging"}
+                                                                   legend-attribs)]])))
+                          (mapcat identity)
+                          (into [])))
+               (some? x-name)
+               (into (adjustable-text [[(+ x-min
+                                           (/ x-range
+                                              2.0))
+                                        (* y-max
+                                           0.999)
+                                        x-name
+                                        {:dy                (/ scale
+                                                               -4.0)
+                                         :font-size         (/ scale
+                                                               2.0)
+                                         :font-family       "Arial, sans-serif"
+                                         :font-style        "italic"
+                                         :fill              color
+                                         :text-anchor       "middle"
+                                         :dominant-baseline "text-bottom"}]]))
+               (some? y-name)
+               (into (adjustable-text [[x-min
+                                        (* y-max
+                                           0.999)
+                                        y-name
+                                        {:dx                (/ scale
+                                                               2.0)
+                                         :dy                (/ scale
+                                                               2.0)
+                                         ;;:writing-mode      "vertical-lr"
+                                         :text-orientation  "sideways"
+                                         :font-size         (/ scale
+                                                               2.0)
+                                         :fill              color
+                                         :font-family       "Arial, sans-serif"
+                                         :font-style        "italic"
+                                         :text-anchor       "beginning"
+                                         :dominant-baseline "hanging"}]])))}))
 
 (defn
   primary-axis
@@ -478,6 +539,7 @@
                                :pos         (- height
                                                (* margin-frac
                                                   height))
+                               :attribs     {:stroke color}
                                :label-dist  (/ scale
                                                1.75)
                                :attribs     {:stroke main-color}
@@ -512,19 +574,21 @@
                                              viz/default-svg-label)
                            :pos         (* margin-frac
                                            width)
+                           :attribs     {:stroke color}
                            :major-size  (/ scale
                                            3.0)
                            :label-dist  (/ scale
                                            4.0)
                            :label-y     (/ scale
                                            -4.0)
-                           :attribs     {:stroke color}
                            :label-style {:fill        color
                                          :stroke      "none"
                                          :font-family "Arial, sans-serif"
                                          :font-size   (/ scale
                                                          2.0)
                                          :text-anchor "end"}})
+     :attribs {:stroke color
+               :fill   color}
      :grid   {:attribs {:stroke           "#caa"
                         :stroke-dasharray (str (/ scale
                                                   10.0)
@@ -547,6 +611,8 @@
                                          :font-size         scale
                                          :font-family       "Arial, sans-serif"
                                          :fill              "#0004"
+                                         :stroke-width (/ scale
+                                                          30.0)
                                          :text-anchor       "end"
                                          :dominant-baseline "hanging"}]]))
                (some? legend)
