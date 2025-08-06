@@ -1264,7 +1264,6 @@
   "Error bars are drawn on x y values
   Error can be specified with single values or double (for asymmetric bars)
   [x, y, x-err, y-err]
-  [x, y, [x-err-neg, x-err-pos], [y-err-neg, y-err-pos]]
   Where the sigle `x-err` is a one sided error
   NOTE: Maybe doesn't work correctly on logarithmic plots?
   "
