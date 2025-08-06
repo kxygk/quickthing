@@ -1811,15 +1811,206 @@
                                  " "
                                  total-height)}))))
 
+
+(defn
+  sturges-bin-num
+  "Uses Sturges' rule to detemine an optimal number of bins
+  NOTE: You re-`count` the data.. so a bit suboptimal"
+  [data-vec]
+  (-> data-vec
+      count
+      clojure.math/log
+      (/ (clojure.math/log 2))
+      clojure.math/ceil
+      inc))
+
+
+
+
+
+#_#_
+    counts-for-each-index (->> indeces
+                                   (mapv (fn [time-index]
+                                           (let [rain-vector (-> data-matrix
+                                                                 (uncomplicate.neanderthal.core/col time-index)
+                                                                 seq
+                                                                 vec)]
+                                             (let [bin-size (-> rain-vector
+                                                                count
+                                                                clojure.math/log
+                                                                (/ (clojure.math/log 2))
+                                                                clojure.math/ceil
+                                                                inc)] ;; Sturges' rule
+                                               (->> (update-vals (->> (uncomplicate.neanderthal.core/col data-matrix
+                                                                                                         time-index)
+                                                                      seq
+                                                                      vec
+                                                                      (mapv #(/ %
+                                                                                bin-size))
+                                                                      (mapv int )
+                                                                      (mapv (partial *
+                                                                                     bin-size))
+                                                                      (group-by identity))
+                                                                 count)
+                                                    (into (sorted-map-by <))))))))
+
+(defn
+  bin-data
+  "The data is expected to be 1D
+  [a,b,c,d,e,..]
+  It gets binned according to the Sturges Rule bin size.
+  You get back a vector of
+  [[x,w]
+   [y,u]
+   [z,v]
+  ..]
+  Where  x y z are the bin centers
+  And w u v are the counts"
+  [data-vec
+   & [{:keys [binfactor]
+       :or {binfactor 5}}]]
+  (let [data-min (apply min
+                        data-vec)
+        data-max (apply max
+                        data-vec)]
+    (let [bin-size (/ (- data-max
+                         data-min)
+                      (* binfactor
+                         (sturges-bin-num data-vec)))
+          zeroed-data (->> data-vec
+                           (mapv #(- %
+                                     data-min)))]
+      (let [bin-indeces (->> zeroed-data
+                             (mapv (fn [data-val]
+                                     (-> data-val
+                                         (/ bin-size)
+                                         clojure.math/floor
+                                         int))))]
+        (vec (update-keys (update-vals (group-by identity
+                                                 bin-indeces)
+                                       count)
+                          (fn [bin-index]
+                            (+ (* bin-index
+                                  bin-size)
+                               (/ bin-size
+                                  2.0)
+                               data-min))))))))
+
+(vec (bin-data [1.1 2.2 3.4 5.5 6.7 8.8 9.9 4.4 3.4 5.6])) 
+;; => [[1.9800000000000002 2]
+;;     [3.7400000000000007 3]
+;;     [5.5 2]
+;;     [7.260000000000002 1]
+;;     [9.020000000000001 1]
+;;     [10.780000000000001 1]]
+
+
+(defn
+  ecdf
+  "Take a sequence [a, b, c, d, ..]
+  And return a
+  [[x,w]
+   [y,u]
+   [z,v]
+  ..]
+  that represents the eCDF
+  NOTE: The integration direction can be reversed"
+  [data-vec
+   & [{:keys [reversed?]
+       :or   {reversed? false}}]]
+  (let [step-size (/ 1.0
+                     (count data-vec))]
+    (->> data-vec
+         (sort (if reversed?
+                    >
+                    <))
+         (mapv (fn [cumulative-probability
+                    data-point]
+                 [data-point
+                  cumulative-probability])
+               (range step-size
+                      (+ 1.0
+                         step-size)
+                      step-size))
+         (into [[0.0
+                 0.0]])
+         (partition 2
+                    1)
+         (mapv (fn [[[bottom-x
+                      bottom-y]
+                     [top-x
+                      top-y]]]
+                 [[top-x
+                   bottom-y]
+                  [top-x
+                   top-y]]))
+         (reduce into ;; a 1-level `flatten`
+                 []))))
+#_
+(ecdf [1.1
+       1.3
+       1.5
+       2.0
+       3.0
+       3.4
+       3.5
+       3.6])
+;; => [[1.1 0.0]
+;;     [1.1 0.125]
+;;     [1.3 0.125]
+;;     [1.3 0.25]
+;;     [1.5 0.25]
+;;     [1.5 0.375]
+;;     [2.0 0.375]
+;;     [2.0 0.5]
+;;     [3.0 0.5]
+;;     [3.0 0.625]
+;;     [3.4 0.625]
+;;     [3.4 0.75]
+;;     [3.5 0.75]
+;;     [3.5 0.875]
+;;     [3.6 0.875]
+;;     [3.6 1.0]]
+
+(sort <
+         [4.5
+       1.1
+       1.3
+       1.5
+       2.0
+       3.0
+       3.4
+       3.5
+       3.6])
+
 (defn
   hist
+  "Histograph of a bunch sequence of points.
+  The data is expected to be 1D
+  [a,b,c,d,e,..].
+  NOTE: b/c you don't have x/y limits a priori,
+  this will rarely make sense to run..
+  Probably want to `bin-data` manually.
+  Then run `bars` "
+  [data
+   & [{:keys [attribs]}]]
+  [{:values  (-> data
+                 bin-data)
+    :attribs (merge {:fill         "none"
+                     :stroke-width 10
+                     :stroke       "#ffb2b0"}
+                    attribs)
+    :layout  viz/svg-bar-plot}])
+
+(defn
+  bars
   [data
    & [{:keys [attribs]}]]
   [{:values  data
     :attribs (merge {:fill         "none"
                      :stroke-width 10
                      :stroke       "#ffb2b0"}
-                    attribs)
+                     attribs)
     :layout  viz/svg-bar-plot}])
 #_
 (let [width     1000
