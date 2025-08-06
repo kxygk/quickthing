@@ -158,7 +158,7 @@
               (let [tooltip      (:tooltip inner-attribs)
                     text-element (svg/text [plot-x, plot-y]
                                            (str text)
-                                           (merge {:fill              "#444"
+                                           (merge {:fill              "#000"
                                                    :stroke            "none"
                                                    :text-anchor       "middle"
                                                    :dominant-baseline "central"
@@ -210,16 +210,17 @@
               scale
               x-name ;; names for the axis
               y-name
+              legend
               color
               title]
        :or   {width       default-width
               height      default-height
               margin-frac nil
               scale       36
-              color       "#0008"}}]]
+              color       "#000f"}}]]
   (let [margin-frac (if (nil? margin-frac)
                       (/ scale
-                         100.0)
+                         400.0)
                       margin-frac)
         xs      (->> data
                      (map first))
@@ -630,8 +631,8 @@
                                                             legend-text
                                                             (merge {:dx                (/ scale
                                                                                           2.0)
-                                                                    :dy                (+ (/ scale
-                                                                                             2.0)
+                                                                    :dy                (+ (* scale
+                                                                                             1.5)
                                                                                           (*  row
                                                                                               (/ scale
                                                                                                  1.5)))
@@ -639,6 +640,9 @@
                                                                     :font-size         (/ scale
                                                                                           2.0)
                                                                     :fill              color
+                                                                    :stroke-width (/ scale
+                                                                                     100.0)
+                                                                    :stroke "#000f"
                                                                     #_#_:font-family
                                                                     "Arial, sans-serif"
                                                                     :font-style        "italic"
@@ -780,8 +784,8 @@
                                                      -6.0)
                                 :label-dist  (/ scale
                                                 -5.75)
-                                :attribs     {:stroke main-color}
-                                :label-style {:fill        "none" #_main-color
+                                :attribs     {:stroke color}
+                                :label-style {:fill        color
                                               :stroke      "none"
                                               :font-family "Arial, sans-serif"
                                               :font-size   (/ scale
@@ -802,8 +806,7 @@
                                                  height)]
                                 :major       (->> y-range
                                                   Math/log10
-                                                  long
-                                                  dec
+                                                  Math/floor
                                                   (Math/pow 10))
                                 :label       (->> y-range
                                                   Math/log10
@@ -1063,20 +1066,27 @@
                    _ ;; data-y
                    r
                    inner-attribs]]]
-              (let [tooltip (:tooltip inner-attribs)
-                    circle  (svg/circle [plot-x, plot-y]
-                                        (if (nil? r)
-                                          (/ scale
-                                             3.0)
-                                          r)
-                                        (merge attribs ;; point-specific `:attribs` overwrite
-                                               inner-attribs))]
-                (if (nil? tooltip)
-                  circle
-                  (svg/group {}
-                             circle
-                             (svg-title tooltip)))))
-    :layout viz/svg-scatter-plot}])
+              (let [radius (if (nil? r)
+                             (/ scale
+                                3.0)
+                             r)]
+                (let [tooltip (:tooltip inner-attribs)
+                      circle  (svg/circle [plot-x, plot-y]
+                                          (if (nil? r)
+                                            (/ scale
+                                               3.0)
+                                            radius)
+                                          (merge {:stroke-width (/ radius
+                                                                   10.0)
+                                                  :stroke "#000f"}
+                                                 attribs ;; point-specific `:attribs` overwrite
+                                                 inner-attribs))]
+                  (if (nil? tooltip)
+                    circle
+                    (svg/group {}
+                               circle
+                               (svg-title tooltip))))))
+              :layout viz/svg-scatter-plot}])
 
 ;; DOESN"T QUITE WORK: b/c the `err-x` and `err-y` are in SVG coordinates.
 ;; They aren't in the plotting data coordinates
