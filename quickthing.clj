@@ -1324,60 +1324,244 @@
        flatten
        vec))
 #_
-(error-bars [[0 1 1 1]
-             [1 1 1 1]
-             [2 3 2 2]])
-;; => [[{:values [(0 1) (1 1) (2 3)],
-;;       :shape #function[quickthing/adjustable-circles/fn--50652],
-;;       :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
-;;      {:values [[-1 1] [1 1]],
-;;       :attribs {:stroke-width 0.72, :stroke "black"},
-;;       :layout #function[quickthing/svg-trueline-plot]}
-;;      {:values [[0 0] [0 2]],
-;;       :attribs {:stroke-width 0.72, :stroke "black"},
-;;       :layout #function[quickthing/svg-trueline-plot]}]
-;;     [{:values [(0 1) (1 1) (2 3)],
-;;       :shape #function[quickthing/adjustable-circles/fn--50652],
-;;       :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
-;;      {:values [[0 1] [2 1]],
-;;       :attribs {:stroke-width 0.72, :stroke "black"},
-;;       :layout #function[quickthing/svg-trueline-plot]}
-;;      {:values [[1 0] [1 2]],
-;;       :attribs {:stroke-width 0.72, :stroke "black"},
-;;       :layout #function[quickthing/svg-trueline-plot]}]
-;;     [{:values [(0 1) (1 1) (2 3)],
-;;       :shape #function[quickthing/adjustable-circles/fn--50652],
-;;       :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
-;;      {:values [[0 3] [4 3]],
-;;       :attribs {:stroke-width 0.72, :stroke "black"},
-;;       :layout #function[quickthing/svg-trueline-plot]}
-;;      {:values [[2 1] [2 5]],
-;;       :attribs {:stroke-width 0.72, :stroke "black"},
-;;       :layout #function[quickthing/svg-trueline-plot]}]]
+(error-bars [[0 1 {:err-x 1
+                   :err-y 2}]
+             [1 1  {:err-x 1
+                    :err-y 1}]
+             [2 3  {:err-x 2
+                    :err-y 2}]])
+;; => [{:values [(0 1) (1 1) (2 3)],
+;;      :shape #function[quickthing/adjustable-circles/fn--50461],
+;;      :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
+;;     {:values [[-1 1] [1 1]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values [[0 -1] [0 3]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values [(0 1) (1 1) (2 3)],
+;;      :shape #function[quickthing/adjustable-circles/fn--50461],
+;;      :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
+;;     {:values [[0 1] [2 1]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values [[1 0] [1 2]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values [(0 1) (1 1) (2 3)],
+;;      :shape #function[quickthing/adjustable-circles/fn--50461],
+;;      :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
+;;     {:values [[0 3] [4 3]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values [[2 1] [2 5]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}]
+
+
+(defn-
+  ellipse-radius-at-angle
+  "Radius of an ellipse at a given angle away from the major-axis"
+  [angle-from-major-axis-rad
+   semi-major-axis-length
+   semi-minor-axis-length]
+  (/ (* 1.0
+        semi-major-axis-length
+        semi-minor-axis-length)
+     (sqrt (+ (pow (* semi-minor-axis-length
+                      (cos angle-from-major-axis-rad))
+                   2.0)
+              (pow (* semi-major-axis-length
+                      (sin angle-from-major-axis-rad))
+                   2.0)))))
+#_
+(ellipse-radius-at-angle (/ PI
+                            4.0)
+                         10.0
+                         2.0)
+;; => 1.2649110640673518
+
+(atan 99999999999999)
+
+(defn-
+  angle-of-orthogonal
+  [point-x
+   point-y]
+  (mod (+ (/ PI
+             2.0)
+          (if (zero? point-x)
+            (/ PI
+               2.0)
+            (atan (/ point-y
+                     point-x))))
+       PI))
+#_
+(-> (angle-of-orthogonal 0.0
+                         1.0)
+    to-degrees)
+#_
+(-> (angle-of-orthogonal 1.0
+                         1.0)
+    to-degrees)
+;; => 135.0
+#_
+(-> (angle-of-orthogonal -1.0
+                         1.0)
+    to-degrees)
+;; => 45.0
+#_
+(-> (angle-of-orthogonal -1.0
+                         -1.0)
+    to-degrees)
+;; => 135.0
 
 #_
+(-> (angle-of-orthogonal 1.0
+                         -1.0)
+    to-degrees)
+;; => 45.0
+(-> (angle-of-orthogonal -2.0
+                         1.0)
+    to-degrees)
+;; => 63.43494882292201
+(-> (angle-of-orthogonal 2.0
+                         -1.0)
+    to-degrees)
+;; => 63.43494882292201
+(-> (angle-of-orthogonal -1.0
+                         2.0)
+    to-degrees)
+;; => 26.565051177077994
+
 (defn
-  events-2-rates
-  [event-size
-   events]
-  (->> events
-       set
-       (into [])
-       sort
-       (partition 2
-                  1)
-       (mapcat #(let [start (first %)
-                      end   (second %)]
-                  (let [event-time (- (second %)
-                                      (first %))
-                        rate       (/ event-size
-                                      event-time)]
-                    [[start, rate]
-                     [end,   rate]])))
-       (into [])))
+  orthogonal-error-length
+  "Assuming orthogonal errors in X and Y,
+  `err-x` `err-y` for point at `x` and `y`
+  Calculate an angular error.
+  Take the error ellipse..
+  The diameter at an angle `u` is
+  2ab/sqrt( (b cos(u))^2 + (a sin(u))^2 )
+  Where
+  `a` is the semi-major axis
+  `b` is the semi-minor axis (ie. divided by 2)
+  "
+  [[cent-x
+    cent-y
+    {:keys [err-x
+            err-y]}
+    :as data-point]]
+  (let [fat-ellipse?     (> err-x
+                            err-y)
+        orthogonal-angle (angle-of-orthogonal cent-x
+                                              cent-y)]
+    (let [semi-major (if fat-ellipse?
+                       err-x
+                       err-y)
+          semi-minor (if fat-ellipse?
+                       err-y
+                       err-x)]
+      (if fat-ellipse?
+        (ellipse-radius-at-angle orthogonal-angle
+                                 semi-major
+                                 semi-minor)
+        (ellipse-radius-at-angle (+ orthogonal-angle
+                                    (/ PI
+                                       2.0))
+                                 semi-major
+                                 semi-minor)))))
 #_
-(events-2-rates 100
-                [1, 2, 4, 5, 6])
+(orthogonal-error-length [-2.0
+                          1.0
+                          {:err-x 10
+                           :err-y 2}])
+;; => 2.2249707974499238
+#_
+(orthogonal-error-length -2.0
+                         1.0
+                         2
+                         10)
+;; => Execution error (ArityException) at quickthing/eval111592 (REPL:1476).
+;;    Wrong number of args (4) passed to: quickthing/orthogonal-error-length;; => 4.152273992686997;; => 2.7735009811261455
+
+(defn-
+  orthogonal-error-coords
+  "The coordinated of the line illustrating the orthogonal error"
+  [[cent-x
+    cent-y
+    {:keys [err-x
+            err-y]}
+    :as data-point]]
+  (let [length    (orthogonal-error-length data-point)
+        angle-rad (angle-of-orthogonal cent-x
+                                       cent-y)]
+    (let [x-shift (* length
+                     (cos angle-rad))
+          y-shift (* length
+                     (sin angle-rad))]
+      [[(- cent-x
+           x-shift)
+        (- cent-y
+           y-shift)]
+       [(+ cent-x
+           x-shift)
+        (+ cent-y
+           y-shift)]])))
+#_
+(orthogonal-error-coords [-0.2
+                          0.2
+                          {:err-x 0.02
+                           :err-y 0.01}])
+;; => [[-0.20894427190999917 0.19105572809000085]
+;;     [-0.19105572809000085 0.20894427190999917]]
+
+(defn
+  orthogonal-error-bars
+  "Assume `x-err` and `y-err` are defined.
+  Calculated the orthogonal error.
+  This is thee error that forms the angular error of a point"
+  [data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}
+       :as   options}]]
+
+  (->> data
+       (mapv (fn [[x
+                   y
+                   {:keys [err-x
+                           err-y]}]]
+               [{:values  (orthogonal-error-coords [x
+                                                    y
+                                                    {:err-x err-x
+                                                     :err-y err-y}])
+                 :attribs (merge {:stroke-width (/ scale
+                                                   50.0)
+                                  :stroke       "black"}
+                                 attribs)
+                 :layout  svg-trueline-plot}]))
+       flatten
+       vec))
+#_
+(orthogonal-error-bars [[0 1 {:err-x 1
+                              :err-y 2}]
+                        [1 1  {:err-x 1
+                               :err-y 1}]
+                        [2 3  {:err-x 2
+                               :err-y 2}]])
+;; => [{:values [[-1.0 1.0] [1.0 1.0]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values
+;;      [[1.7071067811865475 0.2928932188134524]
+;;       [0.29289321881345254 1.7071067811865475]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values
+;;      [[3.664100588675687 1.8905996075495417]
+;;       [0.33589941132431256 4.109400392450459]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}]
 
 (defn
   vector2d
