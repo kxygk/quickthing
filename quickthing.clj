@@ -191,12 +191,12 @@
         (->> tick-value
              (format "%.2G")
              str)
-      (str ((viz/value-formatter (if (neg? power)
-                                   (-> power
-                                       Math/abs
-                                       long)
-                                   0))
-            tick-value))))))
+        (str ((viz/value-formatter (if (neg? power)
+                                     (-> power
+                                         Math/abs
+                                         long)
+                                     0))
+              tick-value))))))
 
 (defn
   zero-axis
@@ -222,34 +222,34 @@
                       (/ scale
                          400.0)
                       margin-frac)
-        xs      (->> data
-                     (map first))
-        ys      (->> data
-                     (map second))
-        x-min   (let [min (apply min
-                                 xs)]
-                  (if (pos? min)
-                    0.0
-                    min))
-        x-max   (let [max (apply max
-                                 xs)]
-                  (if (neg? max)
-                    0.0
-                    max))
-        y-min   (let [min (apply min
-                                 ys)]
-                  (if (pos? min)
-                    0.0
-                    min))
-        y-max   (let [max (apply  max
-                                  ys)]
-                  (if (neg? max)
-                    0.0
-                    max))
-        x-range (max (Math/abs x-max)
-                     (Math/abs x-min))
-        y-range (max (Math/abs y-max)
-                     (Math/abs y-min))]
+        xs          (->> data
+                         (map first))
+        ys          (->> data
+                         (map second))
+        x-min       (let [min (apply min
+                                     xs)]
+                      (if (pos? min)
+                        0.0
+                        min))
+        x-max       (let [max (apply max
+                                     xs)]
+                      (if (neg? max)
+                        0.0
+                        max))
+        y-min       (let [min (apply min
+                                     ys)]
+                      (if (pos? min)
+                        0.0
+                        min))
+        y-max       (let [max (apply  max
+                                      ys)]
+                      (if (neg? max)
+                        0.0
+                        max))
+        x-range     (max (Math/abs x-max)
+                         (Math/abs x-min))
+        y-range     (max (Math/abs y-max)
+                         (Math/abs y-min))]
     {:x-axis (viz/linear-axis
                {:domain      [(- (if (zero? x-min)
                                    0.0
@@ -289,7 +289,7 @@
                                       offset)
                                    (/ height
                                       2.0))))
-                :attribs     {:stroke color
+                :attribs     {:stroke       color
                               :stroke-width (/ scale
                                                10)}
                 :label-dist  (/ scale
@@ -343,7 +343,7 @@
                                    offset
                                    (/ width
                                       2.0))))
-                :attribs     {:stroke color
+                :attribs     {:stroke       color
                               :stroke-width (/ scale
                                                10)}
                 :label-dist  (/ scale
@@ -736,33 +736,33 @@
                          400.0)
                       margin-frac)
         xs          (->> data
-                        (map first))
+                         (map first))
         ys          (->> data
-                        (map second))
+                         (map second))
         x-min       (apply min
-                          xs)
+                           xs)
         x-max       (apply max
-                          xs)
+                           xs)
         y-min       (apply min
-                          ys)
+                           ys)
         y-max       (apply max
-                          ys)
+                           ys)
         x-range     (- x-max
-                      x-min)
+                       x-min)
         y-range     (- y-max
-                      y-min)
+                       y-min)
         y-full-max  (+ y-max
-                      (* y-range
-                         y-breathing-room))
+                       (* y-range
+                          y-breathing-room))
         y-full-min  (let [y-min-with-buffer (- y-min
                                                (* y-range
                                                   y-breathing-room))]
-                     ;; don't add bottom buffer space if you're around zero
-                     (if (and (>= y-min
-                                  0)
-                              (neg? y-min-with-buffer))
-                       0.0
-                       y-min-with-buffer))]
+                      ;; don't add bottom buffer space if you're around zero
+                      (if (and (>= y-min
+                                   0)
+                               (neg? y-min-with-buffer))
+                        0.0
+                        y-min-with-buffer))]
     {:x-axis  (viz/linear-axis {:domain      [x-min, x-max]
                                 :range       [(* margin-frac
                                                  width)
@@ -1040,8 +1040,8 @@
    & options]
   (-> data
       (primary-axis #_ (-> options
-                        (assoc :margin-frac
-                               0)))
+                           (assoc :margin-frac
+                                  0)))
       (assoc-in [:x-axis
                  :visible]
                 false)
@@ -1111,8 +1111,8 @@
                     circle  (svg/ellipse [plot-x, plot-y]
                                          err-x
                                          err-y
-                                        (merge attribs ;; point-specific `:attribs` overwrite
-                                               inner-attribs))]
+                                         (merge attribs ;; point-specific `:attribs` overwrite
+                                                inner-attribs))]
                 (if (nil? tooltip)
                   circle
                   (svg/group {}
@@ -1165,13 +1165,13 @@
               scale   36}}]]
   [{:values  data
     :attribs (merge {#_#_:stroke-dasharray (str (/ scale
-                                               10.0)
-                                            " "
-                                            (/ scale
-                                               10.0))
-                     :stroke-width     (/ scale
-                                          10.0)
-                     :stroke           "#aaa"}
+                                                   10.0)
+                                                " "
+                                                (/ scale
+                                                   10.0))
+                     :stroke-width         (/ scale
+                                              10.0)
+                     :stroke               "#aaa"}
                     attribs)
     :layout  svg-trueline-plot}])
 
@@ -1259,14 +1259,20 @@
               :layout  svg-trueline-plot}]))))))
 #_
 (polyline [[0 0] [9000 100]] [10.0 1.0])
+;; => [{:values [[0 10.0] [90.0 100]],
+;;      :attribs {:stroke-width 3.6, :stroke "#aaa"},
+;;      :layout #function[quickthing/svg-trueline-plot]}]
 
 (defn
   error-bars
   "Error bars are drawn on x y values
-  Error can be specified with single values or double (for asymmetric bars)
-  [x, y, x-err, y-err]
-  Where the sigle `x-err` is a one sided error
-  NOTE: Maybe doesn't work correctly on logarithmic plots?
+  [x
+   y
+  {:err-x
+   :err-y}]
+  Either `x-err` or `y-err` can be null
+  NOTE: Has not been tested on logarithmic plots.
+  But should work..
   "
   [data
    & [{:keys [attribs
@@ -1394,7 +1400,7 @@
            1.0])
 #_
 (quickthing/zero-axis [[ 2.0,  2.0]
-                                [-2.0, -2.0]])
+                       [-2.0, -2.0]])
 ;; => {:x-axis
 ;;     {:scale #function[thi.ng.geom.viz.core/linear-scale/fn--49576],
 ;;      :major-size 10,
@@ -1864,30 +1870,30 @@
 
 
 #_#_
-    counts-for-each-index (->> indeces
-                                   (mapv (fn [time-index]
-                                           (let [rain-vector (-> data-matrix
-                                                                 (uncomplicate.neanderthal.core/col time-index)
-                                                                 seq
-                                                                 vec)]
-                                             (let [bin-size (-> rain-vector
-                                                                count
-                                                                clojure.math/log
-                                                                (/ (clojure.math/log 2))
-                                                                clojure.math/ceil
-                                                                inc)] ;; Sturges' rule
-                                               (->> (update-vals (->> (uncomplicate.neanderthal.core/col data-matrix
-                                                                                                         time-index)
-                                                                      seq
-                                                                      vec
-                                                                      (mapv #(/ %
-                                                                                bin-size))
-                                                                      (mapv int )
-                                                                      (mapv (partial *
-                                                                                     bin-size))
-                                                                      (group-by identity))
-                                                                 count)
-                                                    (into (sorted-map-by <))))))))
+counts-for-each-index (->> indeces
+                           (mapv (fn [time-index]
+                                   (let [rain-vector (-> data-matrix
+                                                         (uncomplicate.neanderthal.core/col time-index)
+                                                         seq
+                                                         vec)]
+                                     (let [bin-size (-> rain-vector
+                                                        count
+                                                        clojure.math/log
+                                                        (/ (clojure.math/log 2))
+                                                        clojure.math/ceil
+                                                        inc)] ;; Sturges' rule
+                                       (->> (update-vals (->> (uncomplicate.neanderthal.core/col data-matrix
+                                                                                                 time-index)
+                                                              seq
+                                                              vec
+                                                              (mapv #(/ %
+                                                                        bin-size))
+                                                              (mapv int )
+                                                              (mapv (partial *
+                                                                             bin-size))
+                                                              (group-by identity))
+                                                         count)
+                                            (into (sorted-map-by <))))))))
 
 (defn
   bin-data
@@ -1903,15 +1909,15 @@
   And w u v are the counts"
   [data-vec
    & [{:keys [binfactor]
-       :or {binfactor 5}}]]
+       :or   {binfactor 5}}]]
   (let [data-min (apply min
                         data-vec)
         data-max (apply max
                         data-vec)]
-    (let [bin-size (/ (- data-max
-                         data-min)
-                      (* binfactor
-                         (sturges-bin-num data-vec)))
+    (let [bin-size    (/ (- data-max
+                            data-min)
+                         (* binfactor
+                            (sturges-bin-num data-vec)))
           zeroed-data (->> data-vec
                            (mapv #(- %
                                      data-min)))]
@@ -1957,8 +1963,8 @@
                      (count data-vec))]
     (->> data-vec
          (sort (if reversed?
-                    >
-                    <))
+                 >
+                 <))
          (mapv (fn [cumulative-probability
                     data-point]
                  [data-point
@@ -2008,7 +2014,7 @@
 ;;     [3.6 1.0]]
 
 (sort <
-         [4.5
+      [4.5
        1.1
        1.3
        1.5
@@ -2045,7 +2051,7 @@
     :attribs (merge {:fill         "none"
                      :stroke-width 10
                      :stroke       "#ffb2b0"}
-                     attribs)
+                    attribs)
     :layout  viz/svg-bar-plot}])
 #_
 (let [width     1000
