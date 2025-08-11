@@ -1603,20 +1603,22 @@
        (spit "out/test-dots.svg")))
 
 (defn
-  index-text
+  index-labels
   "Calls `adjustable-text` but inserts the index automatically"
   [data
    & [{:keys [attribs
               scale]
        :or   {attribs nil
               scale   36}}]]
-  (adjustable-text (map-indexed #(conj (into []
-                                             (take 2
-                                                   %2))
-                                       %1)
-                                data)
-                   {:attribs attribs
-                    :scale   scale}))
+  (labels (map-indexed (fn [idx
+                            data-point]
+                         (assoc-in data-point
+                                   [2
+                                    :text]
+                                   idx))
+                       data)
+          {:attribs attribs
+           :scale   scale}))
 
 ;; see: https://github.com/thi-ng/color/issues/10
 (prefer-method clojure.pprint/simple-dispatch
