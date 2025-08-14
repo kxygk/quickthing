@@ -1570,6 +1570,137 @@
 ;;      :attribs {:stroke-width 0.72, :stroke "black"},
 ;;      :layout #function[quickthing/svg-trueline-plot]}]
 
+
+
+(defn
+  parallel-error-length
+  "Assuming orthogonal errors in X and Y,
+  `err-x` `err-y` for point at `x` and `y`
+  Calculate an angular error.
+  Take the error ellipse..
+  The diameter at an angle `u` is
+  2ab/sqrt( (b cos(u))^2 + (a sin(u))^2 )
+  Where
+  `a` is the semi-major axis
+  `b` is the semi-minor axis (ie. divided by 2)
+  "
+  [angle
+   [cent-x
+    cent-y
+    {:keys [err-x
+            err-y]}
+    :as data-point]]
+  (let [fat-ellipse?     (> err-x
+                            err-y)]
+    (let [semi-major (if fat-ellipse?
+                       err-x
+                       err-y)
+          semi-minor (if fat-ellipse?
+                       err-y
+                       err-x)]
+      (if fat-ellipse?
+        (ellipse-radius-at-angle angle
+                                 semi-major
+                                 semi-minor)
+        (ellipse-radius-at-angle (+ angle
+                                    (/ PI
+                                       2.0))
+                                 semi-major
+                                 semi-minor)))))
+
+(defn-
+  parallel-error-coords
+  "The coordinated of the line illustrating the parallel error,
+  parallel to the vector defined by `angle`"
+  [angle
+   [cent-x
+    cent-y
+    {:keys [err-x
+            err-y]}
+    :as data-point]]
+  (let [length    (parallel-error-length angle
+                                         data-point)]
+    (let [x-shift (* length
+                     (cos angle))
+          y-shift (* length
+                     (sin angle))]
+      [[(- cent-x
+           x-shift)
+        (- cent-y
+           y-shift)]
+       [(+ cent-x
+           x-shift)
+        (+ cent-y
+           y-shift)]])))
+
+(defn
+  parallel-error-bars
+  "Assume `x-err` and `y-err` are defined.
+  Calculated the error parallel to a vector,
+  as defined by `angle`"
+  [angle
+   data
+   & [{:keys [attribs
+              scale]
+       :or   {attribs nil
+              scale   36}
+       :as   options}]]
+  (->> data
+       (mapv (fn [[x
+                   y
+                   {:keys [err-x
+                           err-y]}]]
+               [{:values  (parallel-error-coords angle
+                                                 [x
+                                                  y
+                                                  {:err-x err-x
+                                                   :err-y err-y}])
+                 :attribs (merge {:stroke-width (/ scale
+                                                   50.0)
+                                  :stroke       "black"}
+                                 attribs)
+                 :layout  svg-trueline-plot}]))
+       flatten
+       vec))
+#_
+(parallel-error-bars 1.75
+                     [[0 1 {:err-x 1
+                              :err-y 2}]
+                        [1 1  {:err-x 1
+                               :err-y 1}]
+                        [2 3  {:err-x 2
+                               :err-y 2}]])
+;; => [{:values
+;;      [[0.34062805322444173 -0.8803962660636477]
+;;       [-0.34062805322444173 2.8803962660636477]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values
+;;      [[1.178246055649492 0.016014053126063077]
+;;       [0.821753944350508 1.983985946873937]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values
+;;      [[2.356492111298984 1.0320281062521262]
+;;       [1.643507888701016 4.967971893747874]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}]
+
+;; => [{:values [[-1.0 1.0] [1.0 1.0]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values
+;;      [[1.7071067811865475 0.2928932188134524]
+;;       [0.29289321881345254 1.7071067811865475]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}
+;;     {:values
+;;      [[3.664100588675687 1.8905996075495417]
+;;       [0.33589941132431256 4.109400392450459]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}]
+
+
 (defn
   vector2d
   "Draw a vector"
