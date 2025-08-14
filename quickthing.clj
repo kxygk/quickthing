@@ -1324,6 +1324,14 @@
        flatten
        vec))
 #_
+(error-bars [[0 1 {
+                   :err-y 2}]])
+;; => [{:values [(0 1)],
+;;      :shape #function[quickthing/circles/fn--51470],
+;;      :layout #function[thi.ng.geom.viz.core/svg-scatter-plot]}
+;;     {:values [[0 -1] [0 3]],
+;;      :attribs {:stroke-width 0.72, :stroke "black"},
+;;      :layout #function[quickthing/svg-trueline-plot]}]#_
 (error-bars [[0 1 {:err-x 1
                    :err-y 2}]
              [1 1  {:err-x 1
@@ -1525,7 +1533,6 @@
        :or   {attribs nil
               scale   36}
        :as   options}]]
-
   (->> data
        (mapv (fn [[x
                    y
