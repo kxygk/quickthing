@@ -1133,11 +1133,11 @@
          (if item-pos
            (sort-by (comp first item-pos) values)
            (sort-by first values))
-         (sequence (viz/value-transducer {:cull-domain (:domain x-axis)
-                                          :cull-range  (if (< ry1
-                                                              ry2)
-                                                         [ry1, ry2]
-                                                         [ry2, ry1])
+         (sequence (viz/value-transducer {:cull-domain nil #_ (:domain x-axis)
+                                          :cull-range  nil #_ (if (< ry1
+                                                                    ry2)
+                                                               [ry1, ry2]
+                                                               [ry2, ry1])
                                           :item-pos    item-pos
                                           :scale-x     (:scale x-axis)
                                           :scale-y     (:scale y-axis)
