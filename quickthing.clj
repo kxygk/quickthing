@@ -2400,6 +2400,144 @@ counts-for-each-index (->> indeces
 (sort <
       [4.5
        1.1
+(defn
+  ecdf-weighted
+  "Take a sequence [a, b, c, d, ..]
+  And return a
+  [[x,w]
+   [y,u]
+   [z,v]
+  ..]
+  that represents the eCDF
+  NOTE: The integration direction can be reversed"
+  [data-vec
+   weights-vec
+   & [{:keys [reversed?]
+       :or   {reversed? false}}]]
+  (let [sorted-pairs (->> (mapv vector
+                                data-vec
+                                weights-vec)
+                          (sort-by first))]
+    (let [[sum-of-weights
+           with-cummulative-weights] (->> sorted-pairs
+                                          (into [[(first (first sorted-pairs))
+                                                  0.0]])
+                                          (#(if reversed?
+                                              (reverse %)
+                                              %))
+                                          (reduce (fn [[old-sum-of-weights
+                                                        adjusted-vec]
+                                                       [next-coord
+                                                        next-weight]]
+                                                    (let [new-sum-of-weights (+ old-sum-of-weights
+                                                                                next-weight)]
+                                                      [new-sum-of-weights
+                                                       (conj adjusted-vec
+                                                             [next-coord
+                                                              new-sum-of-weights])]))
+                                                  [0.0
+                                                   []]))]
+      (->> with-cummulative-weights
+           (mapv (fn [[coord
+                       weight-sum]]
+                   [coord
+                    (/ weight-sum
+                       sum-of-weights)]))
+           (partition 2
+                      1)
+           (mapv (fn [[[bottom-x
+                        bottom-y]
+                       [top-x
+                        top-y]]]
+                   [[top-x
+                     bottom-y]
+                    [top-x
+                     top-y]]))
+           (reduce into ;; a 1-level `flatten`
+                   [])))))
+#_
+(ecdf-weighted [1.1
+                1.3
+                1.5
+                2.0
+                3.0
+                3.4]
+               [1.0
+                2.0
+                1.0
+                3.0
+                2.0
+                1.0])
+;; => [[1.1 0.0]
+;;     [1.1 0.1]
+;;     [1.3 0.1]
+;;     [1.3 0.3]
+;;     [1.5 0.3]
+;;     [1.5 0.4]
+;;     [2.0 0.4]
+;;     [2.0 0.7]
+;;     [3.0 0.7]
+;;     [3.0 0.9]
+;;     [3.4 0.9]
+;;     [3.4 1.0]]
+
+
+
+(into [[1 2][3 4]] [[5 6][7 8]])
+#_
+(ecdf-weighted [1.1
+                1.3
+                1.5
+                2.0
+                3.0
+                3.4]
+               [1.0
+                2.0
+                1.0
+                3.0
+                2.0
+                1.0]
+               {:reversed? true})
+;; => [[3.0 0.1]
+;;     [3.0 0.3]
+;;     [2.0 0.3]
+;;     [2.0 0.6]
+;;     [1.5 0.6]
+;;     [1.5 0.7]
+;;     [1.3 0.7]
+;;     [1.3 0.9]
+;;     [1.1 0.9]
+;;     [1.1 1.0]
+;;     [0.0 1.0]
+;;     [0.0 1.0]]
+
+
+;; => [[1.1 0.0]
+;;     [1.1 1.0]
+;;     [1.3 1.0]
+;;     [1.3 3.0]
+;;     [1.5 3.0]
+;;     [1.5 4.0]
+;;     [2.0 4.0]
+;;     [2.0 7.0]
+;;     [3.0 7.0]
+;;     [3.0 9.0]
+;;     [3.4 9.0]
+;;     [3.4 10.0]]
+;; => [[1.1 0.0]
+;;     [1.1 1.0]
+;;     [1.3 1.0]
+;;     [1.3 3.0]
+;;     [1.5 3.0]
+;;     [1.5 4.0]
+;;     [2.0 4.0]
+;;     [2.0 7.0]
+;;     [3.0 7.0]
+;;     [3.0 9.0]
+;;     [3.4 9.0]
+;;     [3.4 10.0]]
+
+  (ecdf [1.1
        1.3
        1.5
        2.0
