@@ -1285,16 +1285,16 @@
                    y
                    {:keys [err-x
                            err-y]}]]
-               (into (circles (->> data
-                                   (mapv #(take 2
-                                                %)))
-                              (-> options
-                                  (assoc-in [:attribs
-                                             :fill]
-                                            "black")
-                                  (assoc :scale
-                                         (/ scale
-                                            10.0))))
+               (into [] #_(circles (->> data
+                                        (mapv #(take 2
+                                                     %)))
+                                   (-> options
+                                       (assoc-in [:attribs
+                                                  :fill]
+                                                 "transparent")
+                                       (assoc :scale
+                                              (/ scale
+                                                 10.0))))
                      (into (if (nil? err-x)
                              []
                              (let [x-start (- x
