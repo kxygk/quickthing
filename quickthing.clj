@@ -2269,6 +2269,66 @@ counts-for-each-index (->> indeces
 ;;     [9.020000000000001 1]
 ;;     [10.780000000000001 1]]
 
+(defn
+  bin-weighted-data
+  "The data is expected to be 1D
+  [a,b,c,d,e,..]
+  with an equivalent vector of weights
+  [u,v,w,x,y,..]
+  It gets binned according to the Sturges Rule bin size.
+  You get back a vector of
+  [[x,w]
+   [y,u]
+   [z,v]
+  ..]
+  Where  x y z are the bin centers
+  And w u v are the sum of weights"
+  [data-vec
+   weights-vec
+   & [{:keys [bin-number]
+       :or   {bin-number (sturges-bin-num data-vec)}}]]
+  (let [data-min (apply min
+                        data-vec)
+        data-max (apply max
+                        data-vec)]
+    (let [bin-size    (/ (- data-max
+                            data-min)
+                         bin-number)
+          zeroed-data (->> data-vec
+                           (mapv #(- %
+                                     data-min)))]
+      (let [bin-indeces (->> zeroed-data
+                             (mapv (fn [data-val]
+                                     (-> data-val
+                                         (/ bin-size)
+                                         clojure.math/floor ;; this bins it
+                                         int))))]
+        (let [bin-index-weight-pairs (mapv vector
+                                           bin-indeces
+                                           weights-vec)]
+          (vec (update-keys (update-vals (group-by first
+                                                   bin-index-weight-pairs)
+                                         (fn [points-in-bin-vec]
+                                           (->> points-in-bin-vec
+                                                (mapv second)
+                                                (apply +))))
+                            (fn [bin-index]
+                              (+ (* bin-index
+                                    bin-size)
+                                 (/ bin-size
+                                    2.0)
+                                 data-min)))))))))
+#_
+(vec (bin-weighted-data [1.1 2.2 3.4 5.5 6.7 8.8 9.9 4.4 3.4 5.6]
+                        [1.0 2.0 3.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]))
+;; => [[1.276 1.0]
+;;     [2.332 2.0]
+;;     [3.3880000000000003 4.0]
+;;     [5.5 2.0]
+;;     [6.556000000000001 1.0]
+;;     [8.668000000000001 1.0]
+;;     [10.076 1.0]
+;;     [4.444000000000001 1.0]]
 
 (defn
   ecdf
