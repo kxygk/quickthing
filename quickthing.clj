@@ -1768,7 +1768,8 @@
 ;;      {:stroke "#caa", :stroke-dasharray "3.6 7.2", :stroke-width 0.72},
 ;;      :minor-x true,
 ;;      :minor-y true},
-;;     :data []}#_
+;;     :data []}
+#_
 (->> (-> (quickthing/zero-axis [[ 2.0,  2.0]
                                 [-2.0, -2.0]])
          (assoc :data
