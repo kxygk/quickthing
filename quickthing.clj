@@ -1389,8 +1389,6 @@
                          2.0)
 ;; => 1.2649110640673518
 
-(atan 99999999999999)
-
 (defn-
   angle-of-orthogonal
   [point-x
@@ -1428,18 +1426,6 @@
                          -1.0)
     to-degrees)
 ;; => 45.0
-(-> (angle-of-orthogonal -2.0
-                         1.0)
-    to-degrees)
-;; => 63.43494882292201
-(-> (angle-of-orthogonal 2.0
-                         -1.0)
-    to-degrees)
-;; => 63.43494882292201
-(-> (angle-of-orthogonal -1.0
-                         2.0)
-    to-degrees)
-;; => 26.565051177077994
 
 (defn
   orthogonal-error-length
@@ -1569,8 +1555,6 @@
 ;;       [0.33589941132431256 4.109400392450459]],
 ;;      :attribs {:stroke-width 0.72, :stroke "black"},
 ;;      :layout #function[quickthing/svg-trueline-plot]}]
-
-
 
 (defn
   parallel-error-length
@@ -2191,9 +2175,6 @@
       inc))
 
 
-
-
-
 #_#_
 counts-for-each-index (->> indeces
                            (mapv (fn [time-index]
@@ -2481,9 +2462,6 @@ counts-for-each-index (->> indeces
 ;;     [3.4 0.9]
 ;;     [3.4 1.0]]
 
-
-
-(into [[1 2][3 4]] [[5 6][7 8]])
 #_
 (ecdf-weighted [1.1
                 1.3
@@ -2511,7 +2489,6 @@ counts-for-each-index (->> indeces
 ;;     [0.0 1.0]
 ;;     [0.0 1.0]]
 
-
 ;; => [[1.1 0.0]
 ;;     [1.1 1.0]
 ;;     [1.3 1.0]
@@ -2536,15 +2513,6 @@ counts-for-each-index (->> indeces
 ;;     [3.0 9.0]
 ;;     [3.4 9.0]
 ;;     [3.4 10.0]]
-
-  (ecdf [1.1
-       1.3
-       1.5
-       2.0
-       3.0
-       3.4
-       3.5
-       3.6])
 
 (defn
   hist
